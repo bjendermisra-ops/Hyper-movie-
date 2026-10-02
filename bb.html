@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StreamBox</title>
+<style>
+:root{--bg:#0e0e12;--card:#1a1a22;--text:#f2f2f5;--mute:#9a9aa8;--accent:#B54666}
+@media (prefers-color-scheme:light){:root{--bg:#f5f5f8;--card:#fff;--text:#16161c;--mute:#6a6a78}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;background:var(--bg);border-bottom:1px solid #8883}
+.logo{font-weight:800;font-size:1.2rem}.logo span{color:var(--accent)}
+nav{display:flex;gap:4px}
+nav button{background:none;color:var(--mute);border:0;padding:8px 10px;border-radius:8px;font:inherit;cursor:pointer}
+nav button.on{color:var(--text);background:var(--card)}
+#q{flex:1 1 160px;padding:9px 12px;border-radius:20px;border:1px solid #8884;background:var(--card);color:var(--text);font:inherit}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600}
+.btn.alt{background:var(--card);color:var(--text);border:1px solid #8884}
+.ico{background:none;border:0;color:var(--text);font-size:1.2rem}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.hero{position:relative;border-radius:14px;overflow:hidden;min-height:260px;background:#000 center/cover;display:flex;align-items:flex-end;margin-bottom:8px}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#000d,#0000 70%)}
+.hero div{position:relative;padding:20px;color:#fff;max-width:640px}
+.hero h1{margin:0 0 6px;font-size:1.6rem}.hero p{margin:0 0 12px;font-size:.9rem;opacity:.9;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+h2{font-size:1.05rem;margin:22px 0 10px}
+.row{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.card{flex:0 0 130px;cursor:pointer}.grid .card{flex:auto}
+.card img,.card .ph{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:8px;background:var(--card);display:block}
+.card p{margin:6px 0 0;font-size:.82rem;line-height:1.2}
+.card small{color:var(--mute)}
+.bar{height:3px;background:#8886;border-radius:2px;margin-top:4px}.bar i{display:block;height:100%;background:var(--accent)}
+.modal{position:fixed;inset:0;z-index:20;background:#000c;display:none;align-items:center;justify-content:center;padding:12px}
+.modal.on{display:flex}
+.box{background:var(--card);border-radius:14px;width:100%;max-width:820px;max-height:92vh;overflow:auto;position:relative}
+.box .x{position:absolute;top:8px;right:10px;z-index:2;background:#000a;color:#fff;border-radius:50%;width:34px;height:34px;border:0}
+.bd{height:200px;background:#000 center/cover}
+.pad{padding:16px}
+.pad h3{margin:0 0 4px;font-size:1.3rem}.meta{color:var(--mute);font-size:.85rem;margin-bottom:10px}
+.acts{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+select,input.s{padding:9px;border-radius:8px;border:1px solid #8884;background:var(--bg);color:var(--text);font:inherit;width:100%;margin:4px 0 10px}
+.ep{display:flex;gap:10px;padding:8px;border-radius:8px;cursor:pointer}.ep:hover{background:#8882}
+.ep b{min-width:26px;color:var(--accent)}.ep span{font-size:.88rem}
+#pbox{max-width:1000px;background:#000}
+#pbox .frame{aspect-ratio:16/9}#pbox iframe{width:100%;height:100%;border:0}
+.empty{color:var(--mute);padding:20px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Stream<span>Box</span></div>
+  <nav id="nav"></nav>
+  <input id="q" type="search" placeholder="Search movies & shows…">
+  <button class="ico" id="gear" title="Settings">⚙️</button>
+</header>
+<main id="main"></main>
+<footer style="text-align:center;color:var(--mute);font-size:.75rem;padding:16px 16px 28px">This product uses the TMDB API but is not endorsed or certified by TMDB.</footer>
+
+<div class="modal" id="dm"><div class="box"><button class="x" data-close>✕</button><div id="dbody"></div></div></div>
+<div class="modal" id="pm"><div class="box" id="pbox"><button class="x" data-close>✕</button><div class="frame" id="frame"></div></div></div>
+<div class="modal" id="sm"><div class="box"><button class="x" data-close>✕</button><div class="pad" id="sbody"></div></div></div>
+
+<script>
+const ORIGIN='https://peachify.pro', IMG='https://image.tmdb.org/t/p/', $=s=>document.querySelector(s);
+const ls={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const DEFAULT_KEY='317e4f5a1bcfc46e5d5e7280b9bd7459';
+let settings={key:'',server:'',dub:'',sub:'',quality:'',...ls.get('sb_set',{})}, tab='home', frameWin=null, lastSave=0;
+const list=()=>ls.get('sb_list',[]);
+const progress=()=>ls.get('peachifyProgress',{});
+
+/* tiny DOM helper */
+function h(tag,props={},...kids){const e=document.createElement(tag);
+  for(const[k,v]of Object.entries(props))k in e&&k!=='style'?e[k]=v:e.setAttribute(k,v);
+  e.append(...kids.flat().filter(x=>x!=null));return e}
+
+/* TMDB */
+async function api(path,params={}){
+  if(!settings.key)throw new Error('NOKEY');
+  const u=new URL('https://api.themoviedb.org/3'+path),o={};
+  if(settings.key.length>40)o.headers={Authorization:'Bearer '+settings.key};else u.searchParams.set('api_key',settings.key);
+  for(const[k,v]of Object.entries(params))u.searchParams.set(k,v);
+  const r=await fetch(u.toString(),o);if(!r.ok)throw new Error(r.status===401?'Invalid TMDB key':'TMDB error '+r.status);
+  return r.json();
+}
+const title=i=>i.title||i.name||'';
+const year=i=>(i.release_date||i.first_air_date||'').slice(0,4);
+const typeOf=(i,d)=>i.media_type||d;
+
+/* cards */
+function card(i,dt){
+  const t=typeOf(i,dt);if(t!=='movie'&&t!=='tv')return null;
+  const c=h('div',{className:'card'},
+    i.poster_path?h('img',{src:IMG+'w342'+i.poster_path,alt:title(i),loading:'lazy'}):h('div',{className:'ph'}),
+    h('p',{},title(i)),h('small',{},[year(i),i.vote_average?'★ '+i.vote_average.toFixed(1):''].filter(Boolean).join(' · ')));
+  c.onclick=()=>openDetail(t,i.id);return c;
+}
+const row=(name,items,dt)=>h('section',{},h('h2',{},name),h('div',{className:'row'},items.map(i=>card(i,dt))));
+
+/* views */
+function nav(){
+  const nv=$('#nav');nv.replaceChildren(...[['home','Home'],['movie','Movies'],['tv','TV'],['list','My List']].map(([k,l])=>{
+    const b=h('button',{textContent:l,className:tab===k?'on':''});b.onclick=()=>{$('#q').value='';tab=k;render()};return b}));
+}
+function cwRow(){
+  const items=Object.values(progress()).sort((a,b)=>(b.last_updated||0)-(a.last_updated||0));
+  if(!items.length)return null;
+  return h('section',{},h('h2',{},'Continue Watching'),h('div',{className:'row'},items.map(it=>{
+    const p=it.progress||{},c=h('div',{className:'card'},
+      it.poster_path?h('img',{src:IMG+'w342'+it.poster_path,alt:''}):h('div',{className:'ph'}),
+      h('p',{},it.title+(it.type==='tv'?` S${it.last_season_watched}E${it.last_episode_watched}`:'')),
+      h('div',{className:'bar'},h('i',{style:`width:${Math.min(100,p.watched/p.duration*100||0)}%`})));
+    c.onclick=()=>play(it.type,String(it.id),it.last_season_watched||1,it.last_episode_watched||1,it.title);return c})));
+}
+async function render(){
+  nav();const m=$('#main');
+  if(!settings.key){m.replaceChildren(h('div',{className:'empty'},'Add your free TMDB API key to start. ',(()=>{const b=h('button',{className:'btn',textContent:'Open Settings'});b.onclick=openSettings;return b})()));return}
+  m.replaceChildren(h('div',{className:'empty'},'Loading…'));
+  try{
+    if(tab==='list'){const l=list();m.replaceChildren(h('h2',{},'My List'),l.length?h('div',{className:'grid'},l.map(i=>card(i,i.media_type))):h('div',{className:'empty'},'Nothing saved yet. Open a title and tap “+ My List”.'));return}
+    const R={home:[['Trending This Week','/trending/all/week'],['Popular Movies','/movie/popular','movie'],['Popular TV Shows','/tv/popular','tv'],['Top Rated Movies','/movie/top_rated','movie'],['Top Rated TV','/tv/top_rated','tv']],
+      movie:[['Popular','/movie/popular','movie'],['Now Playing','/movie/now_playing','movie'],['Top Rated','/movie/top_rated','movie'],['Upcoming','/movie/upcoming','movie']],
+      tv:[['Popular','/tv/popular','tv'],['Airing Today','/tv/airing_today','tv'],['Top Rated','/tv/top_rated','tv'],['On The Air','/tv/on_the_air','tv']]}[tab];
+    const data=await Promise.all(R.map(r=>api(r[1])));
+    const out=[];
+    if(tab==='home'){const f=data[0].results.find(x=>x.backdrop_path&&x.media_type!=='person');
+      if(f){const t=typeOf(f);const hero=h('div',{className:'hero'},h('div',{},h('h1',{},title(f)),h('p',{},f.overview||''),h('button',{className:'btn',textContent:'▶ Play'})));
+        hero.style.backgroundImage=`url(${IMG}w1280${f.backdrop_path})`;hero.querySelector('button').onclick=()=>openDetail(t,f.id);out.push(hero)}
+      out.push(cwRow())}
+    R.forEach((r,i)=>out.push(row(r[0],data[i].results,r[2])));
+    m.replaceChildren(...out.filter(Boolean));
+  }catch(e){m.replaceChildren(h('div',{className:'empty'},e.message==='NOKEY'?'Add TMDB key in settings.':'Error: '+e.message))}
+}
+
+/* search */
+let st;$('#q').oninput=e=>{clearTimeout(st);const v=e.target.value.trim();
+  st=setTimeout(async()=>{if(!v){render();return}if(!settings.key)return;
+    try{const d=await api('/search/multi',{query:v});const r=d.results.filter(x=>x.media_type!=='person');
+      $('#main').replaceChildren(h('h2',{},`Results for “${v}”`),r.length?h('div',{className:'grid'},r.map(i=>card(i))):h('div',{className:'empty'},'No results.'))}catch(e){}},400)};
+
+/* details */
+const modal=(id,on)=>$(id).classList.toggle('on',on);
+async function openDetail(t,id){
+  const body=$('#dbody');body.replaceChildren(h('div',{className:'pad'},'Loading…'));modal('#dm',true);
+  try{
+    const d=await api(`/${t}/${id}`),inList=list().some(x=>x.id===d.id&&x.media_type===t);
+    const bd=h('div',{className:'bd'});if(d.backdrop_path)bd.style.backgroundImage=`url(${IMG}w780${d.backdrop_path})`;
+    const act=h('div',{className:'acts'});
+    const lb=h('button',{className:'btn alt',textContent:inList?'✓ In My List':'+ My List'});
+    lb.onclick=()=>{let l=list();const has=l.some(x=>x.id===d.id&&x.media_type===t);
+      l=has?l.filter(x=>!(x.id===d.id&&x.media_type===t)):[...l,{id:d.id,media_type:t,title:d.title,name:d.name,poster_path:d.poster_path,release_date:d.release_date,first_air_date:d.first_air_date,vote_average:d.vote_average}];
+      ls.set('sb_list',l);lb.textContent=has?'+ My List':'✓ In My List';if(tab==='list')render()};
+    const pad=h('div',{className:'pad'},h('h3',{},title(d)),
+      h('div',{className:'meta'},[year(d),d.runtime?d.runtime+' min':'',d.number_of_seasons?d.number_of_seasons+' seasons':'',d.vote_average?'★ '+d.vote_average.toFixed(1):'',(d.genres||[]).map(g=>g.name).join(', ')].filter(Boolean).join(' · ')),
+      h('p',{},d.overview||''),act);
+    if(t==='movie'){const pb=h('button',{className:'btn',textContent:'▶ Play'});pb.onclick=()=>play('movie',String(id),1,1,d.title);act.append(pb,lb)}
+    else{act.append(lb);
+      const seasons=d.seasons.filter(s=>s.season_number>0),sel=h('select',{},seasons.map(s=>h('option',{value:s.season_number,textContent:s.name})));
+      const eps=h('div');pad.append(sel,eps);
+      const loadS=async n=>{eps.replaceChildren('Loading…');const s=await api(`/tv/${id}/season/${n}`);
+        eps.replaceChildren(...s.episodes.map(e=>{const r=h('div',{className:'ep'},h('b',{},e.episode_number),h('span',{},e.name+(e.runtime?` · ${e.runtime}m`:'')));
+          r.onclick=()=>play('tv',String(id),n,e.episode_number,d.name);return r}))};
+      sel.onchange=()=>loadS(sel.value);if(seasons.length)loadS(seasons[0].season_number)}
+    body.replaceChildren(bd,pad);
+  }catch(e){body.replaceChildren(h('div',{className:'pad'},'Error: '+e.message))}
+}
+
+/* player */
+function playerUrl(t,id,s,e){
+  const u=new URL(t==='tv'?`/embed/tv/${id}/${s}/${e}`:`/embed/movie/${id}`,ORIGIN);
+  u.searchParams.set('accent','B54666');
+  if(t==='tv')u.searchParams.set('autoNext','true');
+  if(settings.server)u.searchParams.set('server',settings.server);
+  if(settings.dub)u.searchParams.set('dub',settings.dub);
+  if(settings.sub)u.searchParams.set('sub',settings.sub);
+  if(settings.quality)u.searchParams.set('quality',settings.quality);
+  const p=progress()[id],pr=t==='tv'?p?.show_progress?.[`s${s}e${e}`]?.progress:p?.progress;
+  if(pr&&pr.watched>5&&pr.watched/pr.duration<.95)u.searchParams.set('startAt',Math.floor(pr.watched));
+  return u.toString();
+}
+function play(t,id,s,e){
+  modal('#dm',false);
+  const f=h('iframe',{src:playerUrl(t,id,s,e),allow:'autoplay; fullscreen; picture-in-picture; encrypted-media',allowFullscreen:true,title:'Player'});
+  $('#frame').replaceChildren(f);frameWin=f.contentWindow;modal('#pm',true);
+}
+function closePlayer(){modal('#pm',false);$('#frame').replaceChildren();frameWin=null;if(tab==='home')render()}
+addEventListener('message',e=>{
+  if(e.origin!==ORIGIN||!frameWin||e.source!==frameWin)return;
+  const m=e.data;
+  if(m?.type==='MEDIA_DATA'&&m.data&&typeof m.data==='object'&&Date.now()-lastSave>5000){lastSave=Date.now();ls.set('peachifyProgress',{...progress(),...m.data})}
+  if(m?.type==='PLAYER_EVENT'&&['pause','seeked','ended'].includes(m.data?.event))lastSave=0;
+});
+
+/* settings */
+function openSettings(){
+  const k=h('input',{className:'s',value:settings.key,placeholder:'TMDB API key or v4 token'}),
+        sv=h('select',{},[['','Auto'],['iron','Iron'],['spider','Spider'],['wolf','Wolf']].map(([v,l])=>h('option',{value:v,textContent:l,selected:v===settings.server}))),
+        db=h('input',{className:'s',value:settings.dub,placeholder:'e.g. Hindi'}),
+        sb=h('input',{className:'s',value:settings.sub,placeholder:'e.g. English'}),
+        q=h('select',{},['','2160','1080','720','480'].map(v=>h('option',{value:v,textContent:v?v+'p':'Auto',selected:v===settings.quality}))),
+        s=h('button',{className:'btn',textContent:'Save'});
+  s.onclick=()=>{settings={key:k.value.trim(),server:sv.value,dub:db.value.trim(),sub:sb.value.trim(),quality:q.value};ls.set('sb_set',settings);modal('#sm',false);render()};
+  $('#sbody').replaceChildren(h('h3',{},'Settings'),
+    h('label',{},'TMDB API key (free at themoviedb.org → Settings → API)'),k,
+    h('label',{},'Preferred server (try another if one fails)'),sv,
+    h('label',{},'Preferred dub / audio'),db,
+    h('label',{},'Preferred subtitle'),sb,h('label',{},'Preferred quality'),q,s);
+  modal('#sm',true);
+}
+settings.key=settings.key||DEFAULT_KEY;
+$('#gear').onclick=openSettings;
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{b.closest('#pm')?closePlayer():modal('#'+b.closest('.modal').id,false)});
+document.querySelectorAll('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.id==='pm'?closePlayer():modal('#'+m.id,false)});
+render();
+</script>
+</body>
+</html>
