@@ -1,4 +1,4 @@
-// api/send-push.js (Zero-Dependency Node.js Serverless Function)
+// api/send-push.js (Zero-Dependency Node.js FCM v1 Gateway)
 const crypto = require('crypto');
 
 const PROJECT_ID = "radha-krishna-chandra";
@@ -41,7 +41,6 @@ function base64url(input) {
     .replace(/\//g, '_');
 }
 
-// Google OAuth 2.0 Access Token जनरेटर
 async function getGoogleAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   const header = { alg: 'RS256', typ: 'JWT' };
@@ -83,77 +82,59 @@ async function getGoogleAccessToken() {
 }
 
 module.exports = async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      success: false, 
-      reason: "Method Not Allowed", 
-      details: "केवल POST अनुरोध मान्य है।" 
-    });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ success: false, reason: "Method Not Allowed" });
 
   const { title, body, imageUrl, actionUrl, topic } = req.body || {};
 
-  if (!title || !title.trim()) {
-    return res.status(400).json({ success: false, reason: "Missing Title", details: "शीर्षक (Title) अनिवार्य है।" });
-  }
+  if (!title || !title.trim()) return res.status(400).json({ success: false, reason: "Missing Title" });
+  if (!body || !body.trim()) return res.status(400).json({ success: false, reason: "Missing Body" });
 
-  if (!body || !body.trim()) {
-    return res.status(400).json({ success: false, reason: "Missing Body", details: "संदेश (Body) अनिवार्य है।" });
-  }
-
-  const targetTopic = (!topic || topic === 'all' || topic === 'temple_all') ? 'all' : topic;
+  const targetTopic = (!topic || topic === 'all' || topic === 'temple_all') ? 'temple_all' : topic;
+  const safeImg = (imageUrl && imageUrl.trim().startsWith('http')) ? imageUrl.trim() : "";
+  const safeAction = (actionUrl && actionUrl.trim()) ? actionUrl.trim() : "index.html";
 
   try {
-    // 1. Google OAuth2 Access Token प्राप्त करें
     const accessToken = await getGoogleAccessToken();
 
-    // 2. Google FCM v1 Message Payload तैयार करें
+    // Data-First Payload (भुवैकुण्ठ की तरह जो 100% ऑन-स्क्रीन पॉपअप लाता है)
     const fcmPayload = {
       message: {
         topic: targetTopic,
         notification: {
           title: title.trim(),
           body: body.trim(),
-          ...(imageUrl && imageUrl.trim().startsWith('http') ? { image: imageUrl.trim() } : {})
+          ...(safeImg ? { image: safeImg } : {})
         },
         data: {
           title: title.trim(),
           body: body.trim(),
           message: body.trim(),
-          ...(imageUrl && imageUrl.trim().startsWith('http') ? { 
-            imageUrl: imageUrl.trim(), 
-            image: imageUrl.trim(), 
-            img: imageUrl.trim() 
-          } : {}),
-          ...(actionUrl && actionUrl.trim() ? { 
-            targetUrl: actionUrl.trim(), 
-            link: actionUrl.trim(), 
-            url: actionUrl.trim() 
-          } : {})
+          image: safeImg,
+          imageUrl: safeImg,
+          img: safeImg,
+          page: safeAction,
+          url: safeAction,
+          target_page: safeAction,
+          targetUrl: safeAction
         },
         android: {
           priority: "HIGH",
           notification: {
-            channel_id: "radha_krishna_chandra_channel",
+            channel_id: "padyatra_loud_v5",
             notification_priority: "PRIORITY_MAX",
             default_sound: true,
             default_vibrate_timings: true,
-            ...(imageUrl && imageUrl.trim().startsWith('http') ? { image: imageUrl.trim() } : {})
+            ...(safeImg ? { image: safeImg } : {})
           }
         }
       }
     };
 
-    // 3. Google FCM v1 API को सीधे POST करें
     const fcmRes = await fetch(`https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`, {
       method: 'POST',
       headers: {
@@ -164,13 +145,11 @@ module.exports = async function handler(req, res) {
     });
 
     const fcmData = await fcmRes.json();
-
     if (!fcmRes.ok) {
       return res.status(fcmRes.status).json({
         success: false,
         reason: fcmData.error?.status || "FCM_API_ERROR",
-        details: fcmData.error?.message || "Google FCM ने संदेश अस्वीकार कर दिया।",
-        diagnosis: "कृपया इमेज URL और टॉपिक नाम जांचें।"
+        details: fcmData.error?.message || "Google FCM Rejected Message"
       });
     }
 
@@ -185,8 +164,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({
       success: false,
       reason: "SERVER_EXECUTION_ERROR",
-      details: err.message,
-      diagnosis: "Google API टोकन साइन करने में त्रुटि।"
+      details: err.message
     });
   }
 };
