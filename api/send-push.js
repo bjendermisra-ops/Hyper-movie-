@@ -101,15 +101,10 @@ module.exports = async function handler(req, res) {
   try {
     const accessToken = await getGoogleAccessToken();
 
-    // Data-First Payload (भुवैकुण्ठ की तरह जो 100% ऑन-स्क्रीन पॉपअप लाता है)
+    // 🔥 100% CRASH-PROOF: केवल DATA PAYLOAD भेजा जा रहा है (Zero Android 12+ Crash)
     const fcmPayload = {
       message: {
         topic: targetTopic,
-        notification: {
-          title: title.trim(),
-          body: body.trim(),
-          ...(safeImg ? { image: safeImg } : {})
-        },
         data: {
           title: title.trim(),
           body: body.trim(),
@@ -123,14 +118,7 @@ module.exports = async function handler(req, res) {
           targetUrl: safeAction
         },
         android: {
-          priority: "HIGH",
-          notification: {
-            channel_id: "padyatra_loud_v5",
-            notification_priority: "PRIORITY_MAX",
-            default_sound: true,
-            default_vibrate_timings: true,
-            ...(safeImg ? { image: safeImg } : {})
-          }
+          priority: "HIGH"
         }
       }
     };
