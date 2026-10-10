@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support karo ☕</title>
+<style>
+:root{--n:#1e2a78;--bg:#f7f8fc;--m:#6b7280}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:#111827}
+main{max-width:440px;margin:0 auto;padding:20px}
+.card{background:#fff;border-radius:18px;box-shadow:0 2px 12px #0001;padding:20px;text-align:center}
+h1{color:var(--n);font-size:24px;margin:6px 0}.m{color:var(--m);font-size:14px}
+.id{font-size:18px;font-weight:700;background:#eef0f6;border-radius:12px;padding:12px;margin:12px 0;word-break:break-all}
+#qr{display:flex;justify-content:center;margin:14px 0}
+button,a.btn{display:block;width:100%;text-decoration:none;background:var(--n);color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:600;margin-top:10px}
+.alt{background:#fff!important;color:var(--n)!important;border:1px solid var(--n)}
+</style></head><body><main><div class="card">
+<div style="font-size:44px">☕</div>
+<h1>Mujhe support karo</h1>
+<div class="m" id="nm"></div>
+<div id="qr"></div>
+<div class="m">QR dusre phone se scan karo, ya UPI ID copy karke apni app mein daalo</div>
+<div class="id" id="id"></div>
+<button id="cp">UPI ID copy karo</button>
+<div class="m" style="margin-top:18px">Apni UPI app kholo:</div>
+<div id="apps"></div>
+<p class="m">Amount aur UPI ID aap apni app mein khud daalenge. Payment ka status apni UPI app mein check karein.</p>
+</div></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// ===== APNI DETAILS YAHAN =====
+const CFG={upi:"9552865929@axl",name:""};
+// ==============================
+const $=s=>document.querySelector(s);
+$("#id").textContent=CFG.upi;
+if(CFG.name)$("#nm").textContent=CFG.name;
+const q=new URLSearchParams({pa:CFG.upi});if(CFG.name)q.set("pn",CFG.name);
+new QRCode($("#qr"),{text:"upi://pay?"+q.toString().replace(/\+/g,"%20"),width:200,height:200});
+$("#cp").onclick=async()=>{try{await navigator.clipboard.writeText(CFG.upi);$("#cp").textContent="Copy ho gaya ✓"}catch{prompt("UPI ID:",CFG.upi)}};
+$("#apps").innerHTML=[["PhonePe","phonepe","com.phonepe.app"],["Google Pay","tez","com.google.android.apps.nbu.paisa.user"],["Paytm","paytmmp","net.one97.paytm"],["BHIM","bhim","in.org.npci.upiapp"]].map(([n,s,k])=>`<a class="btn alt" href="intent://#Intent;scheme=${s};package=${k};S.browser_fallback_url=${encodeURIComponent("https://play.google.com/store/apps/details?id="+k)};end">${n} kholo</a>`).join("");
+</script></body></html>
