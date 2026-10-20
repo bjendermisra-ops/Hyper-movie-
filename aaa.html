@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Notification Command Center - Sri Sri Radha Krishna Chandra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@600;800&family=Cinzel:wght@800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{--primary:#FF9933;--primary-dark:#E65100;--dark-bg:#0C0F17;--dark-card:#141824;--border-dark:#22293A;--success:#10B981;--danger:#EF4444;--text-main:#F8FAFC;--text-muted:#94A3B8}
+body{background:var(--dark-bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text-main);min-height:100vh;padding:24px 16px 80px}
+.header-bar{max-width:1200px;margin:0 auto 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-bottom:1px solid var(--border-dark);padding-bottom:20px}
+.brand-title{font-family:'Cinzel',serif;font-weight:900;font-size:1.4rem;color:var(--primary);letter-spacing:1px;margin:0;display:flex;align-items:center;gap:12px}
+.app-container{max-width:1200px;margin:0 auto}
+.custom-card{background:var(--dark-card);border:1px solid var(--border-dark);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.4);height:100%}
+.card-header-custom{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-dark);padding-bottom:12px}
+.form-label{font-size:.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.custom-input,.custom-select,.custom-textarea{width:100%;background:#080A10;border:1.5px solid var(--border-dark);border-radius:12px;color:#fff;padding:12px 14px;font-size:.92rem;font-weight:600;outline:none;transition:all .2s;margin-bottom:16px}
+.custom-input:focus,.custom-select:focus,.custom-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,153,51,.2);background:#0E121B}
+.loud-box{display:flex;gap:12px;align-items:center;background:#080A10;border:1.5px solid var(--border-dark);border-radius:12px;padding:12px 14px;margin-bottom:18px;font-weight:700;font-size:.9rem;cursor:pointer}
+.loud-box input{width:20px;height:20px;accent-color:var(--primary)}
+.send-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;color:#fff;padding:16px;border-radius:14px;font-weight:800;font-size:1rem;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(230,81,0,.4)}
+.send-btn:active{transform:scale(.97)}
+.send-btn:disabled{opacity:.6;cursor:not-allowed}
+.preview-box{background:#000;border:2px solid #2B3346;border-radius:32px;padding:18px 14px;max-width:340px;margin:0 auto}
+.mock-notch{width:90px;height:18px;background:#1E2433;border-radius:20px;margin:0 auto 16px}
+.mock-notification{background:#1C2230;border-radius:18px;padding:14px;border:1px solid rgba(255,255,255,.06)}
+.mock-header{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;color:#CBD5E1;margin-bottom:8px}
+.mock-badge{width:18px;height:18px;background:var(--primary);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#000;font-size:.65rem}
+.mock-title{font-weight:800;font-size:.95rem;color:#fff;margin-bottom:4px}
+.mock-body{font-size:.82rem;color:#94A3B8;line-height:1.4;margin-bottom:10px;word-break:break-word}
+.mock-link{font-size:.72rem;color:#60A5FA;margin-bottom:8px;word-break:break-all;display:none}
+.mock-image{width:100%;height:140px;border-radius:12px;object-fit:cover;display:none;background:#252D3D}
+.diag-box{background:#080A10;border-radius:14px;padding:16px;margin-top:20px;border-left:4px solid #334155;font-family:'JetBrains Mono',monospace;font-size:.8rem;word-break:break-word}
+.diag-success{border-left-color:var(--success)}
+.diag-error{border-left-color:var(--danger);background:rgba(239,68,68,.08)}
+.history-table{width:100%;border-collapse:separate;border-spacing:0 8px}
+.history-table td{padding:12px 14px;font-size:.82rem;vertical-align:middle;background:#0E121B;border-top:1px solid var(--border-dark);border-bottom:1px solid var(--border-dark)}
+.history-table td:first-child{border-left:1px solid var(--border-dark);border-radius:10px 0 0 10px}
+.history-table td:last-child{border-right:1px solid var(--border-dark);border-radius:0 10px 10px 0}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+  <div>
+    <h1 class="brand-title"><i class="fas fa-gopuram"></i> RADHA KRISHNA CHANDRA</h1>
+    <small style="color:var(--text-muted);font-weight:700;letter-spacing:.5px;">FCM PUSH NOTIFICATION COMMAND & DIAGNOSTIC SYSTEM</small>
+  </div>
+  <div>
+    <span class="badge bg-success bg-opacity-20 text-success border border-success px-3 py-2 fw-bold"><i class="fas fa-wifi me-1"></i> FCM Gateway: Active</span>
+    <button type="button" onclick="resetKey()" class="btn btn-sm btn-outline-secondary ms-2"><i class="fas fa-key"></i></button>
+  </div>
+</div>
+
+<div class="app-container">
+<div class="row g-4">
+
+  <div class="col-12 col-lg-7">
+    <div class="custom-card">
+      <div class="card-header-custom"><i class="fas fa-paper-plane text-warning"></i> नोटिफिकेशन भेजें (Send Broadcast)</div>
+
+      <form id="pushForm" onsubmit="handleSendPush(event)">
+        <div class="row g-2">
+          <div class="col-12 col-md-6">
+            <label class="form-label">टारगेट ऑडियंस (Topic) *</label>
+            <select id="pushTopic" class="custom-select" required>
+              <option value="all">🌐 समस्त भक्तगण (Topic: all)</option>
+              <option value="darshan">🌸 दैनिक दर्शन सब्सक्राइबर (Topic: darshan)</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">क्लिक एक्शन (App Page)</label>
+            <select id="pushAction" class="custom-select">
+              <option value="daily_darshan.html">Daily Darshan & Seva Screen</option>
+              <option value="global_jap.html">Live Global Japa Screen</option>
+              <option value="home.html">Home Dashboard</option>
+              <option value="calendar.html">Ekadashi Calendar</option>
+              <option value="dono.html">Donation / Seva Screen</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="form-label">नोटिफिकेशन शीर्षक (Title) *</label>
+        <input type="text" id="pushTitle" class="custom-input" placeholder="e.g. 🌸 राजभोग शृंगार दर्शन" required oninput="updatePreview()">
+
+        <label class="form-label">संदेश विवरण (Message Body) *</label>
+        <textarea id="pushBody" class="custom-textarea" rows="3" placeholder="भक्तों के लिए पावन संदेश लिखें..." required oninput="updatePreview()"></textarea>
+
+        <label class="form-label">बैनर फोटो URL (Image)</label>
+        <input type="url" id="pushImage" class="custom-input" placeholder="https://.../darshan.jpg" oninput="updatePreview()">
+
+        <label class="form-label">कस्टम लिंक (YouTube / Play Store / कोई भी वेबसाइट)</label>
+        <input type="url" id="pushLink" class="custom-input" placeholder="https://youtu.be/... या https://play.google.com/store/apps/details?id=..." oninput="updatePreview()">
+        <div style="font-size:.75rem;color:var(--text-muted);margin-top:-10px;margin-bottom:16px;">
+          <i class="fas fa-info-circle me-1"></i> लिंक भरा तो नोटिफिकेशन पर टैप करने से वही लिंक खुलेगा। खाली हो तो ऊपर चुना हुआ App Page खुलेगा।
+        </div>
+
+        <label class="loud-box">
+          <input type="checkbox" id="pushLoud">
+          <span>🔊 तेज़ आवाज़ (Silent / Mute मोड में भी बजे)</span>
+        </label>
+
+        <button type="submit" id="submitBtn" class="send-btn"><i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें (Send Push)</button>
+      </form>
+
+      <div id="diagConsole" class="diag-box d-none">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <strong id="diagStatusHead">STATUS</strong>
+          <span id="diagTimestamp" style="font-size:.7rem;opacity:.7;"></span>
+        </div>
+        <div id="diagMessage" style="margin-top:6px;font-weight:600;"></div>
+        <div id="diagReason" style="margin-top:6px;color:#FCA5A5;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="custom-card">
+      <div class="card-header-custom justify-content-between">
+        <span><i class="fas fa-mobile-screen text-warning"></i> लाइव मोबाइल प्रीव्यू</span>
+        <small style="font-size:.72rem;color:var(--text-muted);">Real-time View</small>
+      </div>
+
+      <div class="preview-box">
+        <div class="mock-notch"></div>
+        <div class="mock-notification">
+          <div class="mock-header">
+            <div class="mock-badge"><i class="fas fa-bell"></i></div>
+            <span>श्री श्री राधाकृष्ण चंद्र</span>
+            <span style="opacity:.5;">• अभी</span>
+          </div>
+          <div class="mock-title" id="prevTitle">शीर्षक यहाँ दिखेगा...</div>
+          <div class="mock-body" id="prevBody">आपका पावन संदेश यहाँ दिखेगा...</div>
+          <div class="mock-link" id="prevLink"></div>
+          <img id="prevImg" class="mock-image" src="" alt="Banner">
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <small class="fw-bold" style="color:var(--text-muted);text-transform:uppercase;">हालिया ब्रॉडकास्ट लॉग्स</small>
+          <button onclick="clearHistory()" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:.75rem;">Clear</button>
+        </div>
+        <div style="max-height:200px;overflow-y:auto;">
+          <table class="history-table"><tbody id="historyBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function updatePreview(){
+  const title=document.getElementById('pushTitle').value.trim();
+  const body=document.getElementById('pushBody').value.trim();
+  const img=document.getElementById('pushImage').value.trim();
+  const link=document.getElementById('pushLink').value.trim();
+
+  document.getElementById('prevTitle').innerText=title||"शीर्षक यहाँ दिखेगा...";
+  document.getElementById('prevBody').innerText=body||"आपका पावन संदेश यहाँ दिखेगा...";
+
+  const pl=document.getElementById('prevLink');
+  if(link){pl.innerText='🔗 '+link;pl.style.display='block';}else{pl.style.display='none';}
+
+  const p=document.getElementById('prevImg');
+  if(img&&img.startsWith('http')){
+    p.src=img;p.style.display='block';
+    p.onerror=()=>{p.style.display='none';};
+  }else{p.style.display='none';}
+}
+
+function getKey(){
+  let k=localStorage.getItem('admin_key');
+  if(!k){
+    k=prompt('Admin Key डालो');
+    if(k) localStorage.setItem('admin_key',k);
+  }
+  return k||'';
+}
+function resetKey(){
+  localStorage.removeItem('admin_key');
+  alert('Admin Key हटा दी गई। अगली बार भेजते समय फिर पूछेगा।');
+}
+
+async function handleSendPush(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  const dc=document.getElementById('diagConsole');
+  const head=document.getElementById('diagStatusHead');
+  const msg=document.getElementById('diagMessage');
+  const reason=document.getElementById('diagReason');
+  const ts=document.getElementById('diagTimestamp');
+
+  const title=document.getElementById('pushTitle').value.trim();
+  const body=document.getElementById('pushBody').value.trim();
+  const imageUrl=document.getElementById('pushImage').value.trim();
+  const actionUrl=document.getElementById('pushAction').value;
+  const topic=document.getElementById('pushTopic').value;
+  const customLink=document.getElementById('pushLink').value.trim();
+  const loud=document.getElementById('pushLoud').checked;
+
+  const adminKey=getKey();
+  if(!adminKey){return;}
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> FCM सर्वर से जुड़ रहे हैं...';
+  dc.classList.remove('d-none','diag-success','diag-error');
+  head.innerText="SENDING...";
+  msg.innerText="अनुरोध भेजा जा रहा है...";
+  reason.innerText="";
+  ts.innerText=new Date().toLocaleTimeString();
+
+  try{
+    const response=await fetch('/api/send-push',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-key':adminKey},
+      body:JSON.stringify({title,body,imageUrl,actionUrl,customLink,loud,topic})
+    });
+    const data=await response.json();
+    ts.innerText=new Date().toLocaleTimeString();
+
+    if(response.ok&&data.success){
+      dc.classList.add('diag-success');
+      head.innerHTML='<i class="fas fa-check-circle text-success me-1"></i> SUCCESS (डिलीवर हो गया)';
+      msg.innerHTML='सफलतापूर्वक भेजा गया!<br><small style="color:#A7F3D0;">ID: '+esc(data.messageId)+'</small>';
+      reason.innerText='Topic "'+data.targetTopic+'" के सभी सब्सक्राइबर्स को भेजा गया।';
+      saveToHistory({title,status:'Success',time:new Date().toLocaleTimeString()});
+    }else{
+      if(data.reason==='UNAUTHORIZED'){localStorage.removeItem('admin_key');}
+      dc.classList.add('diag-error');
+      head.innerHTML='<i class="fas fa-times-circle text-danger me-1"></i> FAILED';
+      msg.innerHTML='कारण: <b>'+esc(data.reason||'त्रुटि')+'</b>';
+      reason.innerHTML='<b>विस्तार:</b> '+esc(data.details||'कोई विवरण नहीं')+(data.reason==='UNAUTHORIZED'?'<br>Admin Key फिर से डालनी होगी।':'');
+      saveToHistory({title,status:'Failed: '+(data.reason||'Error'),time:new Date().toLocaleTimeString()});
+    }
+  }catch(err){
+    dc.classList.add('diag-error');
+    head.innerHTML='<i class="fas fa-triangle-exclamation text-danger me-1"></i> GATEWAY ERROR';
+    msg.innerText='/api/send-push से कनेक्ट नहीं हो सका।';
+    reason.innerHTML='<b>त्रुटि:</b> '+esc(err.message)+'<br>क्या api/send-push.js Vercel पर डिप्लॉय है?';
+    saveToHistory({title,status:'Gateway Error',time:new Date().toLocaleTimeString()});
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें (Send Push)';
+  }
+}
+
+function saveToHistory(item){
+  let h=JSON.parse(localStorage.getItem('fcm_push_history')||'[]');
+  h.unshift(item);
+  if(h.length>8)h.pop();
+  localStorage.setItem('fcm_push_history',JSON.stringify(h));
+  renderHistory();
+}
+
+function renderHistory(){
+  const b=document.getElementById('historyBody');
+  const h=JSON.parse(localStorage.getItem('fcm_push_history')||'[]');
+  if(!h.length){
+    b.innerHTML='<tr><td class="text-center text-muted" colspan="2">कोई हालिया लॉग नहीं है।</td></tr>';
+    return;
+  }
+  b.innerHTML=h.map(x=>`
+    <tr>
+      <td>
+        <div class="fw-bold text-white text-truncate" style="max-width:170px;">${esc(x.title)}</div>
+        <small style="color:${x.status.startsWith('Success')?'#34D399':'#F87171'};font-weight:700;">${esc(x.status)}</small>
+      </td>
+      <td class="text-end text-muted font-monospace" style="font-size:.72rem;">${esc(x.time)}</td>
+    </tr>`).join('');
+}
+
+function clearHistory(){
+  localStorage.removeItem('fcm_push_history');
+  renderHistory();
+}
+
+document.addEventListener('DOMContentLoaded',renderHistory);
+</script>
+</body>
+</html>
