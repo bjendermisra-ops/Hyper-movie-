@@ -3,391 +3,495 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notification Command Center - Sri Sri Radha Krishna Chandra</title>
+<title>सूचना केंद्र · श्री श्री राधा कृष्ण चंद्र</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@600;800&family=Cinzel:wght@800;900&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 <style>
-:root{--primary:#FF9933;--primary-dark:#E65100;--bg:#0C0F17;--card:#141824;--bd:#22293A;--ok:#10B981;--bad:#EF4444;--mute:#94A3B8;--txt:#F8FAFC}
-body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt);min-height:100vh;padding:20px 14px 80px}
-.header-bar{max-width:1200px;margin:0 auto 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:16px}
-.brand-title{font-family:'Cinzel',serif;font-weight:900;font-size:1.3rem;color:var(--primary);margin:0}
-.app-container{max-width:1200px;margin:0 auto}
-.custom-card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-.card-h{font-size:1.05rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd);padding-bottom:12px}
-.form-label{font-size:.78rem;font-weight:700;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between}
-.ci,.cs,.ct{width:100%;background:#080A10;border:1.5px solid var(--bd);border-radius:12px;color:#fff;padding:11px 13px;font-size:.92rem;font-weight:600;outline:none;transition:.2s;margin-bottom:14px}
-.ci:focus,.cs:focus,.ct:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,153,51,.2)}
-.cs option{background:#080A10}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
-.chip{background:#0E121B;border:1px solid var(--bd);color:#CBD5E1;font-size:.74rem;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
-.chip:hover{border-color:var(--primary);color:var(--primary)}
-.chip .x{opacity:.5;font-size:.7rem}.chip .x:hover{opacity:1;color:var(--bad)}
-.detect{font-size:.78rem;font-weight:700;margin:-8px 0 14px;display:flex;align-items:center;gap:8px;min-height:20px}
-.detect.good{color:#34D399}.detect.warn{color:#FBBF24}.detect.err{color:#F87171}
-.loud-box{background:rgba(239,68,68,.08);border:1.5px dashed rgba(239,68,68,.4);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.form-check-input:checked{background-color:var(--bad);border-color:var(--bad)}
-.send-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;color:#fff;padding:15px;border-radius:14px;font-weight:800;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(230,81,0,.4)}
-.send-btn:active{transform:scale(.97)}.send-btn:disabled{opacity:.6}
-.ghost-btn{background:transparent;border:1px solid var(--bd);color:var(--mute);border-radius:10px;font-size:.78rem;font-weight:700;padding:6px 12px}
-.ghost-btn:hover{border-color:var(--primary);color:var(--primary)}
-.preview-box{background:#000;border:2px solid #2B3346;border-radius:30px;padding:16px 12px;max-width:340px;margin:0 auto}
-.notch{width:90px;height:16px;background:#1E2433;border-radius:20px;margin:0 auto 14px}
-.mock{background:#1C2230;border-radius:18px;padding:13px;border:1px solid rgba(255,255,255,.06)}
-.mock-h{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;color:#CBD5E1;margin-bottom:8px}
-.badge-i{width:18px;height:18px;background:var(--primary);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#000;font-size:.65rem}
-.mock-t{font-weight:800;font-size:.95rem;margin-bottom:4px}
-.mock-b{font-size:.82rem;color:var(--mute);line-height:1.4;margin-bottom:10px;white-space:pre-wrap}
-.mock-img{width:100%;height:140px;border-radius:12px;object-fit:cover;display:none;background:#252D3D;margin-bottom:8px}
-.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,153,51,.15);color:var(--primary);font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;word-break:break-all}
-.diag{background:#080A10;border-radius:14px;padding:14px;margin-top:18px;border-left:4px solid #334155;font-family:'JetBrains Mono',monospace;font-size:.8rem}
-.diag.s{border-left-color:var(--ok)}.diag.e{border-left-color:var(--bad);background:rgba(239,68,68,.08)}
-.hrow{background:#0E121B;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;cursor:pointer;font-size:.82rem}
-.hrow:hover{border-color:var(--primary)}
-.sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;align-items:center;justify-content:center;padding:16px}
-.sheet.on{display:flex}.sheet>div{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;max-width:420px;width:100%}
+:root{
+  --bg:#150F1E; --panel:#1C1528; --raise:#251C34; --line:#33284A;
+  --ivory:#F6EFE2; --mute:#A99DBF; --saffron:#F2A33A; --kumkum:#C8431A; --tulsi:#4BB486; --rose:#EF6B6B;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 400px at 85% -10%,rgba(242,163,58,.10),transparent),var(--bg);color:var(--ivory);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;padding:0 16px 90px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+.wrap{max-width:1180px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:22px 0 20px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,var(--saffron),var(--kumkum));display:grid;place-items:center;color:#2A1200;font-size:1.25rem;box-shadow:0 0 0 4px rgba(242,163,58,.15)}
+.brand h1{font-family:'Cinzel',serif;font-weight:900;font-size:1.2rem;margin:0;color:var(--saffron);letter-spacing:.04em}
+.brand p{margin:2px 0 0;font-size:.8rem;color:var(--mute)}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;padding:8px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--mute)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.status.ok .dot{background:var(--tulsi);box-shadow:0 0 0 4px rgba(75,180,134,.2)}.status.ok{color:#BDEBD6}
+.status.no .dot{background:var(--rose)}.status.no{color:#F8BDBD}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);color:var(--ivory);border-radius:10px;padding:9px 14px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--saffron);color:var(--saffron)}
+.btn.sm{padding:6px 10px;font-size:.76rem}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:26px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px}
+.sec{padding:24px;border-bottom:1px solid var(--line)}.sec:last-of-type{border-bottom:0}
+.sec h2{margin:0 0 4px;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.sec h2 i{color:var(--saffron);width:18px;text-align:center}
+.sec .sub{margin:0 0 18px;font-size:.8rem;color:var(--mute);line-height:1.5}
+label.l{display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;color:var(--mute);margin:0 0 7px}
+.f,select.f,textarea.f{width:100%;background:var(--bg);border:1.5px solid var(--line);color:var(--ivory);border-radius:11px;padding:12px 14px;font-size:.92rem;font-weight:500;outline:none;transition:.15s;margin-bottom:16px}
+.f:focus{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(242,163,58,.18)}
+select.f option{background:var(--bg)}
+textarea.f{resize:vertical;min-height:84px;line-height:1.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:560px){.two{grid-template-columns:1fr}}
+.actionrow{display:flex;gap:8px}.actionrow .f{margin-bottom:0}
+.iconbtn{flex:0 0 46px;background:var(--raise);border:1.5px solid var(--line);color:var(--saffron);border-radius:11px;cursor:pointer;font-size:1rem}
+.iconbtn:hover{border-color:var(--saffron)}
+.detect{min-height:22px;margin:9px 0 16px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.detect.good{color:#8FDDBB}.detect.warn{color:#F5C56E}.detect.err{color:#F59A9A}
+.tag{font-size:.7rem;padding:2px 8px;border-radius:6px;background:var(--raise);color:var(--mute);font-weight:600}
+.libhead{display:flex;justify-content:space-between;align-items:center;margin:2px 0 9px;font-size:.8rem;font-weight:600;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--raise);border:1px solid var(--line);color:var(--ivory);font-size:.78rem;font-weight:600;padding:6px 11px;border-radius:9px;cursor:pointer;max-width:100%}
+.chip:hover{border-color:var(--saffron)}.chip i{color:var(--saffron);font-size:.8rem}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.add{border-style:dashed;color:var(--mute)}
+.alarm{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid rgba(239,107,107,.35);background:rgba(239,107,107,.07);border-radius:12px;margin-bottom:6px}
+.alarm b{display:block;font-size:.88rem;color:#F8B4B4;margin-bottom:3px}.alarm small{color:var(--mute);font-size:.76rem;line-height:1.45}
+.sw{position:relative;width:48px;height:26px;flex:0 0 48px}
+.sw input{opacity:0;position:absolute;inset:0;margin:0;cursor:pointer;z-index:2}
+.sw s{position:absolute;inset:0;background:var(--line);border-radius:99px;transition:.2s}
+.sw s:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+s{background:var(--rose)}.sw input:checked+s:after{transform:translateX(22px)}
+.sendbar{padding:20px 24px 24px;display:flex;gap:10px;flex-wrap:wrap}
+.send{flex:1;min-width:220px;background:linear-gradient(135deg,var(--saffron),var(--kumkum));color:#2A1200;border:0;border-radius:12px;padding:15px;font-size:.98rem;font-weight:700;cursor:pointer;display:flex;gap:10px;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(200,67,26,.35)}
+.send:active{transform:scale(.98)}.send:disabled{opacity:.6}
+.diag{margin:0 24px 24px;padding:14px 16px;border-radius:12px;background:var(--bg);border-left:4px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.6}
+.diag.s{border-color:var(--tulsi)}.diag.e{border-color:var(--rose)}
+.side{position:sticky;top:16px;display:grid;gap:22px}
+@media(max-width:900px){.side{position:static}}
+.stage{padding:26px 18px;background:linear-gradient(180deg,#0E0914,#1A1226);border-radius:18px;border:1px solid var(--line)}
+.stage .cap{text-align:center;font-size:.76rem;color:var(--mute);margin-bottom:16px}
+.phone{max-width:330px;margin:0 auto;background:#07050B;border:2px solid #3A2E52;border-radius:34px;padding:16px 12px 22px}
+.clock{text-align:center;margin:6px 0 18px}.clock b{font-size:2.3rem;font-weight:500;display:block;letter-spacing:-.02em}.clock small{color:var(--mute);font-size:.76rem}
+.notif{background:#2A2238;border-radius:20px;padding:13px 14px;margin-top:8px}
+.nh{display:flex;align-items:center;gap:8px;font-size:.72rem;color:#CFC5E2;margin-bottom:9px}
+.nb{width:18px;height:18px;border-radius:6px;background:var(--saffron);color:#2A1200;display:grid;place-items:center;font-size:.6rem}
+.nt{font-weight:700;font-size:.93rem;line-height:1.3;margin-bottom:3px;word-break:break-word}
+.nx{font-size:.82rem;color:#BDB2D2;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.ni{width:100%;height:136px;object-fit:cover;border-radius:12px;margin-top:10px;display:none;background:var(--raise)}
+.na{margin-top:11px;display:flex;gap:8px;align-items:center;font-size:.72rem;font-weight:600;color:var(--saffron);background:rgba(242,163,58,.12);padding:6px 10px;border-radius:8px;word-break:break-all}
+.loud{margin-left:auto;color:var(--rose);font-weight:700}
+.hist{padding:20px}.hist h3{margin:0 0 12px;font-size:.92rem;display:flex;justify-content:space-between;align-items:center}
+.hrow{display:flex;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid var(--line);background:var(--raise);border-radius:11px;margin-bottom:8px;cursor:pointer;font-size:.8rem}
+.hrow:hover{border-color:var(--saffron)}.hrow b{display:block;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow small{color:var(--mute)}.hrow .r{text-align:right;font-size:.7rem;color:var(--mute);white-space:nowrap}
+.okc{color:var(--tulsi)}.badc{color:var(--rose)}
+.empty{text-align:center;color:var(--mute);font-size:.8rem;padding:14px}
+.sheet{position:fixed;inset:0;background:rgba(8,5,12,.75);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.sheet.on{display:flex}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;width:100%;max-width:560px;max-height:90vh;overflow:auto;padding:22px}
+.card h3{margin:0 0 4px;font-size:1.05rem}.card .sub{margin:0 0 16px;font-size:.8rem;color:var(--mute)}
+.li{display:flex;gap:12px;align-items:center;padding:11px 12px;border:1px solid var(--line);background:var(--raise);border-radius:11px;margin-bottom:8px}
+.li i.t{color:var(--saffron);width:18px;text-align:center}
+.li div{flex:1;min-width:0}.li b{display:block;font-size:.86rem}.li small{color:var(--mute);font-size:.74rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li button{background:none;border:0;color:var(--mute);cursor:pointer;padding:6px;font-size:.9rem}.li button:hover{color:var(--saffron)}.li button.d:hover{color:var(--rose)}
+.addbox{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ivory);color:#2A1200;font-weight:600;font-size:.84rem;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;margin:0 8px 12px 0}
+.seg button{background:none;border:0;color:var(--mute);padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--saffron);color:#2A1200}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:18px;max-height:250px;overflow:auto}
+.tpls .chip{justify-content:space-between}
+:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="header-bar">
-  <div>
-    <h1 class="brand-title">RADHA KRISHNA CHANDRA</h1>
-    <small style="color:var(--mute);font-weight:700">FCM PUSH NOTIFICATION COMMAND CENTER</small>
+<header class="top">
+  <div class="brand">
+    <div class="mark"><i class="fas fa-om"></i></div>
+    <div><h1>राधा कृष्ण चंद्र</h1><p>पुश नोटिफिकेशन सूचना केंद्र</p></div>
   </div>
-  <div class="d-flex gap-2 align-items-center">
-    <span id="gwBadge" class="badge bg-secondary px-3 py-2"><i class="fas fa-wifi me-1"></i> Gateway: जाँच रहे हैं…</span>
-    <button class="ghost-btn" onclick="openKey()"><i class="fas fa-key"></i> Admin Key</button>
+  <div class="tools">
+    <span class="status" id="gw"><i class="dot"></i><span>जाँच रहे हैं…</span></span>
+    <button class="btn" onclick="openLib()"><i class="fas fa-bookmark"></i> लिंक लाइब्रेरी</button>
+    <button class="btn" onclick="openKey()"><i class="fas fa-key"></i> Admin Key</button>
   </div>
-</div>
+</header>
 
-<div class="app-container"><div class="row g-4">
+<div class="grid">
+<form class="panel" id="form" onsubmit="send(event)">
 
-<div class="col-12 col-lg-7"><div class="custom-card">
-  <div class="card-h"><i class="fas fa-paper-plane text-warning"></i> नोटिफिकेशन भेजें</div>
-
-  <form id="pushForm" onsubmit="handleSend(event)">
-
-    <label class="form-label">क्विक टेम्पलेट</label>
-    <div class="chips" id="tplChips"></div>
-
-    <div class="row g-2">
-      <div class="col-12 col-md-6">
-        <label class="form-label">टारगेट ऑडियंस (Topic) *</label>
-        <select id="topicSel" class="cs" onchange="onTopic()">
-          <option value="all">🌐 समस्त भक्तगण (all)</option>
-          <option value="darshan">🌸 दैनिक दर्शन (darshan)</option>
-          <option value="test">🧪 टेस्ट (test) — सिर्फ आपके लिए</option>
-          <option value="__custom">✏️ कस्टम topic…</option>
+  <div class="sec">
+    <h2><i class="fas fa-users"></i> किसे भेजना है</h2>
+    <p class="sub">Topic चुनें। पहले "test" पर जाँच लें, फिर सबको भेजें।</p>
+    <div class="two">
+      <div>
+        <label class="l">ऑडियंस</label>
+        <select id="topicSel" class="f" onchange="onTopic()">
+          <option value="all">समस्त भक्तगण (all)</option>
+          <option value="darshan">दैनिक दर्शन (darshan)</option>
+          <option value="test">टेस्ट (test)</option>
+          <option value="__c">अपना topic…</option>
         </select>
-        <input id="topicCustom" class="ci d-none" placeholder="topic का नाम, जैसे: ekadashi" oninput="upd()">
+        <input id="topicC" class="f" style="display:none" placeholder="जैसे: ekadashi" oninput="upd()">
       </div>
-      <div class="col-12 col-md-6">
-        <label class="form-label">प्राथमिकता</label>
-        <select id="priority" class="cs">
-          <option value="high">⚡ High (तुरंत)</option>
-          <option value="normal">Normal (बैटरी-फ्रेंडली)</option>
-        </select>
+      <div>
+        <label class="l">प्राथमिकता</label>
+        <select id="priority" class="f"><option value="high">तुरंत (High)</option><option value="normal">सामान्य (Normal)</option></select>
       </div>
     </div>
+  </div>
 
-    <label class="form-label"><span>क्लिक पर क्या खुले? (फ़ाइल का नाम या कोई भी लिंक) *</span></label>
-    <input type="text" id="actionInput" class="ci" autocomplete="off" autocapitalize="off" spellcheck="false"
-      placeholder="dono.html  |  index.html  |  https://youtube.com/live/…" oninput="upd()">
+  <div class="sec">
+    <h2><i class="fas fa-arrow-pointer"></i> क्लिक करने पर क्या खुले</h2>
+    <p class="sub">फ़ाइल का नाम (dono.html) या कोई भी लिंक (YouTube, Play Store, वेबसाइट) लिखें, या लाइब्रेरी से चुनें।</p>
+    <label class="l">फ़ाइल या लिंक</label>
+    <div class="actionrow">
+      <input id="act" class="f" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="dono.html   या   https://youtube.com/live/…" oninput="upd()">
+      <button type="button" class="iconbtn" title="लाइब्रेरी में सेव करें" onclick="openLib(el('act').value)"><i class="fas fa-bookmark"></i></button>
+    </div>
     <div class="detect" id="detect"></div>
 
-    <label class="form-label">ऐप में खुले या ब्राउज़र में?</label>
-    <select id="openIn" class="cs" onchange="upd()">
-      <option value="auto">🤖 ऑटो (पेज/वेब → ऐप, YouTube/PlayStore/WhatsApp → बाहर)</option>
-      <option value="webview">📱 हमेशा ऐप के अंदर (WebView)</option>
-      <option value="external">🌐 हमेशा बाहर (ब्राउज़र / संबंधित ऐप)</option>
+    <label class="l">कहाँ खुले</label>
+    <select id="openIn" class="f" onchange="upd()">
+      <option value="auto">अपने-आप (पेज/वेबसाइट ऐप में, YouTube/Play Store बाहर)</option>
+      <option value="webview">हमेशा ऐप के अंदर</option>
+      <option value="external">हमेशा बाहर (ब्राउज़र या संबंधित ऐप)</option>
     </select>
 
-    <label class="form-label">मेरे सेव किए पेज <small style="font-weight:600;opacity:.7">(टैप = इस्तेमाल)</small></label>
-    <div class="chips" id="pageChips"></div>
-    <div class="chips" id="extChips">
-      <span class="chip" onclick="prefix('https://youtube.com/watch?v=')"><i class="fab fa-youtube text-danger"></i> YouTube</span>
-      <span class="chip" onclick="prefix('https://youtube.com/live/')"><i class="fas fa-circle text-danger"></i> YT Live</span>
-      <span class="chip" onclick="prefix('https://play.google.com/store/apps/details?id=')"><i class="fab fa-google-play text-success"></i> Play Store</span>
-      <span class="chip" onclick="prefix('https://wa.me/91')"><i class="fab fa-whatsapp text-success"></i> WhatsApp</span>
-      <span class="chip" onclick="prefix('tel:+91')"><i class="fas fa-phone"></i> Call</span>
-    </div>
+    <div class="libhead"><span>मेरी लाइब्रेरी</span><button type="button" class="btn sm" onclick="openLib()"><i class="fas fa-pen"></i> मैनेज करें</button></div>
+    <div class="chips" id="libChips"></div>
+  </div>
 
-    <div class="loud-box">
-      <div>
-        <div class="fw-bold text-danger"><i class="fas fa-volume-high me-1"></i> सुपर लाउड अलार्म (Mute Bypass)</div>
-        <small style="color:var(--mute);font-size:.75rem">साइलेंट फोन पर भी अलार्म स्ट्रीम में रिंग। ऐप में data-only हैंडल होना ज़रूरी।</small>
+  <div class="sec">
+    <h2><i class="fas fa-message"></i> संदेश</h2>
+    <p class="sub">भाषा और श्रेणी चुनें, फिर टेम्पलेट पर टैप करें। भरने के बाद कुछ भी बदल सकते हैं।</p>
+    <div class="seg" id="langSeg"></div><div class="seg" id="catSeg"></div>
+    <div class="tpls" id="tplChips"></div>
+
+    <label class="l"><span>शीर्षक</span><span id="cT">0/65</span></label>
+    <input id="title" class="f" maxlength="100" required placeholder="लाइव महाआरती शुरू हो चुकी है" oninput="upd()">
+    <label class="l"><span>विवरण</span><span id="cB">0/240</span></label>
+    <textarea id="body" class="f" maxlength="400" required placeholder="भक्तों के लिए संदेश…" oninput="upd()"></textarea>
+    <label class="l">बैनर फोटो का सीधा लिंक (वैकल्पिक)</label>
+    <input id="img" type="url" class="f" placeholder="https://…/banner.jpg" oninput="upd()">
+
+    <div class="alarm">
+      <div><b><i class="fas fa-volume-high"></i> तेज़ अलार्म मोड</b><small>फोन साइलेंट होने पर भी अलार्म की तरह बजे। ऐप में alarm channel बना होना चाहिए।</small></div>
+      <label class="sw"><input type="checkbox" id="loud" onchange="upd()"><s></s></label>
+    </div>
+  </div>
+
+  <div class="sendbar">
+    <button type="button" class="btn" onclick="saveTpl()"><i class="fas fa-star"></i> टेम्पलेट सेव</button>
+    <button type="button" class="btn" onclick="resetForm()"><i class="fas fa-rotate-left"></i> खाली करें</button>
+    <button type="submit" class="send" id="sendBtn"><i class="fas fa-paper-plane"></i> नोटिफिकेशन भेजें</button>
+  </div>
+  <div id="diag" class="diag" style="display:none"></div>
+</form>
+
+<aside class="side">
+  <div class="stage">
+    <div class="cap">फोन पर ऐसा दिखेगा</div>
+    <div class="phone">
+      <div class="clock"><b id="clk">9:41</b><small>सूचनाएँ</small></div>
+      <div class="notif">
+        <div class="nh"><div class="nb"><i class="fas fa-om"></i></div><span>राधा कृष्ण चंद्र · अभी</span><span class="loud" id="pLoud" style="display:none"><i class="fas fa-volume-high"></i> अलार्म</span></div>
+        <div class="nt" id="pT">शीर्षक यहाँ दिखेगा</div>
+        <div class="nx" id="pB">आपका संदेश यहाँ दिखेगा</div>
+        <img class="ni" id="pI" alt="">
+        <div class="na"><i id="pIc" class="fas fa-link"></i><span id="pL">—</span></div>
       </div>
-      <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="loudSwitch" style="width:2.8em;height:1.4em" onchange="upd()"></div>
     </div>
+  </div>
+  <div class="panel hist">
+    <h3><span>हाल के ब्रॉडकास्ट</span><button class="btn sm" onclick="clearHist()">साफ़ करें</button></h3>
+    <div id="hist"></div>
+  </div>
+</aside>
+</div>
+</div>
 
-    <label class="form-label"><span>शीर्षक (Title) *</span><span id="cntT">0/65</span></label>
-    <input type="text" id="pushTitle" class="ci" maxlength="100" placeholder="🔴 लाइव महाआरती शुरू हो चुकी है!" required oninput="upd()">
-
-    <label class="form-label"><span>संदेश (Body) *</span><span id="cntB">0/240</span></label>
-    <textarea id="pushBody" class="ct" rows="3" maxlength="400" placeholder="भक्तों के लिए पावन संदेश…" required oninput="upd()"></textarea>
-
-    <label class="form-label">बैनर फोटो URL (BigPicture)</label>
-    <input type="url" id="pushImage" class="ci" placeholder="https://…/banner.jpg" oninput="upd()">
-
-    <div class="d-flex gap-2">
-      <button type="button" class="ghost-btn" onclick="saveTpl()"><i class="fas fa-bookmark"></i> टेम्पलेट सेव</button>
-      <button type="button" class="ghost-btn" onclick="resetForm()"><i class="fas fa-rotate-left"></i> रीसेट</button>
+<!-- Link library -->
+<div class="sheet" id="libSheet" onclick="if(event.target===this)closeLib()"><div class="card">
+  <h3>लिंक लाइब्रेरी</h3>
+  <p class="sub">अपने पेज (.html) और बाहरी लिंक यहाँ जोड़ें। एक बार सेव करो, फिर एक टैप में इस्तेमाल करो।</p>
+  <div id="libList"></div>
+  <div class="addbox">
+    <label class="l" id="addLabel">नया जोड़ें</label>
+    <input id="lName" class="f" placeholder="नाम, जैसे: लाइव आरती (YouTube)">
+    <input id="lVal" class="f" style="margin-bottom:8px" placeholder="seva.html  या  https://…" autocapitalize="off" spellcheck="false" oninput="libDetect()">
+    <div class="detect" id="lDetect" style="margin-top:0"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" style="background:var(--saffron);color:#2A1200;border-color:var(--saffron)" type="button" onclick="saveLib()"><i class="fas fa-check"></i> सेव करें</button>
+      <button class="btn" type="button" onclick="cancelEdit()">रद्द</button>
+      <span style="flex:1"></span>
+      <button class="btn" type="button" onclick="exportLib()"><i class="fas fa-copy"></i> कॉपी</button>
+      <button class="btn" type="button" onclick="importLib()"><i class="fas fa-paste"></i> इम्पोर्ट</button>
+      <button class="btn" type="button" onclick="closeLib()">बंद</button>
     </div>
-    <div style="height:14px"></div>
-
-    <button type="submit" id="submitBtn" class="send-btn"><i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें</button>
-  </form>
-
-  <div id="diag" class="diag d-none">
-    <div class="d-flex justify-content-between"><strong id="dHead"></strong><span id="dTime" style="font-size:.7rem;opacity:.7"></span></div>
-    <div id="dMsg" style="margin-top:6px;font-weight:600"></div>
-    <div id="dWhy" style="margin-top:6px;color:#FCA5A5"></div>
   </div>
 </div></div>
 
-<div class="col-12 col-lg-5"><div class="custom-card">
-  <div class="card-h justify-content-between"><span><i class="fas fa-mobile-screen text-warning"></i> लाइव प्रीव्यू</span></div>
-  <div class="preview-box">
-    <div class="notch"></div>
-    <div class="mock">
-      <div class="mock-h">
-        <div class="badge-i"><i class="fas fa-bell"></i></div><span>श्री श्री राधाकृष्ण चंद्र</span><span style="opacity:.5">• अभी</span>
-        <span id="pLoud" class="ms-auto text-danger d-none"><i class="fas fa-volume-high"></i> LOUD</span>
-      </div>
-      <div class="mock-t" id="pT">शीर्षक यहाँ दिखेगा…</div>
-      <div class="mock-b" id="pB">आपका संदेश यहाँ दिखेगा…</div>
-      <img id="pI" class="mock-img" alt="">
-      <div class="pill"><i id="pIcon" class="fas fa-link"></i> <span id="pLink">—</span></div>
-    </div>
-  </div>
-
-  <div class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <small class="fw-bold" style="color:var(--mute)">हालिया ब्रॉडकास्ट <span style="font-weight:600">(टैप = दोबारा लोड)</span></small>
-      <button onclick="clearHist()" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:.75rem">Clear</button>
-    </div>
-    <div id="hist" style="max-height:260px;overflow-y:auto"></div>
-  </div>
+<div class="sheet" id="keySheet" onclick="if(event.target===this)closeKey()"><div class="card" style="max-width:420px">
+  <h3>Admin Key</h3>
+  <p class="sub">वैकल्पिक। भरने पर हर रिक्वेस्ट के साथ header में जाएगी (सिर्फ इसी डिवाइस में सेव)। बैकएंड में जाँच जोड़ने पर ही असर होगा।</p>
+  <input id="keyIn" type="password" class="f" placeholder="Admin key">
+  <div style="display:flex;gap:8px"><button class="btn" type="button" onclick="saveKey()">सेव करें</button><button class="btn" type="button" onclick="closeKey()">बंद</button></div>
 </div></div>
-
-</div></div>
-
-<div class="sheet" id="keySheet"><div>
-  <div class="fw-bold mb-2"><i class="fas fa-key text-warning"></i> Admin Key</div>
-  <small style="color:var(--mute)">यह सिर्फ इसी डिवाइस में सेव होती है और हर रिक्वेस्ट के साथ जाती है, ताकि कोई और आपके endpoint से नोटिफिकेशन न भेज सके। वही key Vercel में ADMIN_KEY रखें।</small>
-  <input type="password" id="keyInput" class="ci mt-3" placeholder="Admin key">
-  <div class="d-flex gap-2"><button class="send-btn" type="button" onclick="saveKey()">सेव करें</button><button class="ghost-btn" type="button" onclick="closeKey()">बंद</button></div>
-</div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const $ = id => document.getElementById(id);
+const el = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const store = {
-  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  get(k,d){ try{ const v = JSON.parse(localStorage.getItem(k)); return v ?? d; }catch{ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
 };
-const DEFAULT_PAGES = ['index.html','home.html','daily_darshan.html','global_jap.html','calendar.html','dono.html','aarti-pustak.html'];
-const TEMPLATES = [
-  {n:'🔴 लाइव आरती', t:'🔴 लाइव महाआरती शुरू हो चुकी है!', b:'आइए, श्री श्री राधा कृष्ण चंद्र की महाआरती के दर्शन करें। हरे कृष्ण 🙏', a:'https://youtube.com/live/', topic:'all', loud:true},
-  {n:'🌸 दैनिक दर्शन', t:'🌸 आज के दर्शन उपलब्ध हैं', b:'श्री श्री राधा कृष्ण चंद्र के आज के श्रृंगार दर्शन करें।', a:'daily_darshan.html', topic:'darshan', loud:false},
-  {n:'🌙 एकादशी', t:'🌙 कल एकादशी है', b:'व्रत का समय और पारण की जानकारी देखें।', a:'calendar.html', topic:'all', loud:false},
-  {n:'🙏 सेवा / दान', t:'🙏 मंदिर सेवा में सहभागी बनें', b:'आपकी छोटी सी सेवा भी भगवान को प्रिय है।', a:'dono.html', topic:'all', loud:false}
-];
+function toast(m){ const t=el('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast.x); toast.x=setTimeout(()=>t.classList.remove('on'),2200); }
+const ic = i => i.includes(' ') ? i : 'fas ' + i;
 
 /* ---------- Smart link detection ---------- */
 function parseAction(raw){
   let v = (raw||'').trim();
-  if(!v) return {type:'none', url:'', label:'लिंक/फ़ाइल का नाम लिखें', icon:'fa-link', cls:'warn'};
-  if(/\s/.test(v)) return {type:'invalid', url:v, label:'नाम/लिंक में space नहीं होना चाहिए', icon:'fa-triangle-exclamation', cls:'err'};
-  if(/^(javascript|data|file):/i.test(v)) return {type:'invalid', url:v, label:'यह लिंक प्रकार सुरक्षित नहीं है', icon:'fa-ban', cls:'err'};
-  if(/^tel:/i.test(v)) return {type:'phone', url:v, label:'फोन कॉल', icon:'fa-phone', cls:'good'};
-  if(/^mailto:/i.test(v)) return {type:'email', url:v, label:'ईमेल', icon:'fa-envelope', cls:'good'};
-  if(/^(upi|market|intent):/i.test(v)) return {type:'deeplink', url:v, label:'डीप लिंक', icon:'fa-link', cls:'good'};
-
-  let isWeb = /^https?:\/\//i.test(v);
+  if(!v) return {type:'none',url:'',label:'',icon:'fa-link',cls:''};
+  if(/\s/.test(v)) return {type:'invalid',url:v,label:'नाम या लिंक में space नहीं हो सकता',icon:'fa-triangle-exclamation',cls:'err'};
+  if(/^(javascript|data|file|vbscript):/i.test(v)) return {type:'invalid',url:v,label:'यह लिंक सुरक्षित नहीं है',icon:'fa-ban',cls:'err'};
+  if(/^tel:/i.test(v)) return {type:'phone',url:v,label:'फोन कॉल',icon:'fa-phone',cls:'good'};
+  if(/^mailto:/i.test(v)) return {type:'email',url:v,label:'ईमेल',icon:'fa-envelope',cls:'good'};
+  if(/^(upi|market|intent):/i.test(v)) return {type:'deeplink',url:v,label:'डीप लिंक',icon:'fa-link',cls:'good'};
+  let web = /^https?:\/\//i.test(v);
   const domainLike = /^[\w-]+(\.[\w-]+)+(\/|$|\?|#)/.test(v) && !/^[^/?#]+\.html?([?#]|$)/i.test(v);
-  if(!isWeb && domainLike){ v = 'https://' + v; isWeb = true; }
-  if(isWeb){
-    let host = '';
-    try { host = new URL(v).hostname.replace(/^(www|m)\./,''); } catch { return {type:'invalid', url:v, label:'अमान्य URL', icon:'fa-triangle-exclamation', cls:'err'}; }
-    if(/^(youtube\.com|youtu\.be)$/.test(host)) return {type:'youtube', url:v, label:'YouTube', icon:'fa-youtube fab', cls:'good'};
-    if(host==='play.google.com') return {type:'playstore', url:v, label:'Play Store', icon:'fa-google-play fab', cls:'good'};
-    if(/^(wa\.me|whatsapp\.com|chat\.whatsapp\.com)$/.test(host)) return {type:'whatsapp', url:v, label:'WhatsApp', icon:'fa-whatsapp fab', cls:'good'};
-    if(/^(facebook\.com|fb\.watch)$/.test(host)) return {type:'facebook', url:v, label:'Facebook', icon:'fa-facebook fab', cls:'good'};
-    if(/^(instagram\.com)$/.test(host)) return {type:'instagram', url:v, label:'Instagram', icon:'fa-instagram fab', cls:'good'};
-    if(host==='t.me') return {type:'telegram', url:v, label:'Telegram', icon:'fa-telegram fab', cls:'good'};
-    return {type:'web', url:v, label:'वेबसाइट', icon:'fa-globe fas', cls:'good'};
+  if(!web && domainLike){ v = 'https://' + v; web = true; }
+  if(web){
+    let h; try{ h = new URL(v).hostname.replace(/^(www|m)\./,''); }catch{ return {type:'invalid',url:v,label:'अमान्य URL',icon:'fa-triangle-exclamation',cls:'err'}; }
+    if(/^(youtube\.com|youtu\.be)$/.test(h)) return {type:'youtube',url:v,label:'YouTube',icon:'fa-youtube fab',cls:'good'};
+    if(h==='play.google.com') return {type:'playstore',url:v,label:'Play Store',icon:'fa-google-play fab',cls:'good'};
+    if(/^(wa\.me|whatsapp\.com|chat\.whatsapp\.com)$/.test(h)) return {type:'whatsapp',url:v,label:'WhatsApp',icon:'fa-whatsapp fab',cls:'good'};
+    if(/^(facebook\.com|fb\.watch)$/.test(h)) return {type:'facebook',url:v,label:'Facebook',icon:'fa-facebook fab',cls:'good'};
+    if(h==='instagram.com') return {type:'instagram',url:v,label:'Instagram',icon:'fa-instagram fab',cls:'good'};
+    if(h==='t.me') return {type:'telegram',url:v,label:'Telegram',icon:'fa-telegram fab',cls:'good'};
+    return {type:'web',url:v,label:'वेबसाइट',icon:'fa-globe fas',cls:'good'};
   }
-  // internal page: dono / dono.html / pages/dono.html?id=2
   if(/^[\w\-\/.]+([?#].*)?$/.test(v) && !v.startsWith('/') && !v.includes('..')){
-    const m = v.match(/^([^?#]*)(.*)$/);
-    let path = m[1], rest = m[2];
-    let fixed = false;
-    if(!/\.html?$/i.test(path)){ path += '.html'; fixed = true; }
-    return {type:'page', url: path + rest, label: fixed ? `ऐप पेज: ${path} (.html अपने-आप जुड़ा)` : `ऐप पेज: ${path}`, icon:'fa-file-code fas', cls:'good'};
+    const m = v.match(/^([^?#]*)(.*)$/); let p = m[1], fixed = false;
+    if(!/\.html?$/i.test(p)){ p += '.html'; fixed = true; }
+    return {type:'page',url:p+m[2],label:'ऐप पेज: '+p+(fixed?' (.html अपने-आप जुड़ा)':''),icon:'fa-file-code fas',cls:'good'};
   }
-  return {type:'invalid', url:v, label:'पहचान नहीं हुई', icon:'fa-triangle-exclamation', cls:'err'};
+  return {type:'invalid',url:v,label:'पहचान नहीं हुई',icon:'fa-triangle-exclamation',cls:'err'};
 }
-function resolveOpenIn(type){
-  const m = $('openIn').value;
-  if(m !== 'auto') return m;
-  return ['page','web'].includes(type) ? 'webview' : 'external';
-}
+const openMode = t => { const m = el('openIn').value; return m!=='auto' ? m : (['page','web'].includes(t) ? 'webview' : 'external'); };
+const detectHTML = (a, withMode) => a.type==='none' ? '' :
+  `<i class="${ic(a.icon)}"></i> ${esc(a.label)}` + (withMode && a.type!=='invalid' ? ` <span class="tag">${openMode(a.type)==='webview'?'ऐप में खुलेगा':'बाहर खुलेगा'}</span>` : '');
 
-/* ---------- UI ---------- */
-function topicValue(){ return $('topicSel').value === '__custom' ? $('topicCustom').value.trim().replace(/[^a-zA-Z0-9-_.~%]/g,'') : $('topicSel').value; }
-function onTopic(){ $('topicCustom').classList.toggle('d-none', $('topicSel').value !== '__custom'); upd(); }
-function prefix(p){ $('actionInput').value = p; $('actionInput').focus(); upd(); }
-function setAction(v){ $('actionInput').value = v; upd(); }
-
+/* ---------- Live UI ---------- */
+const topicVal = () => el('topicSel').value==='__c' ? el('topicC').value.trim().replace(/[^a-zA-Z0-9-_.~%]/g,'') : el('topicSel').value;
+function onTopic(){ el('topicC').style.display = el('topicSel').value==='__c' ? 'block' : 'none'; upd(); }
+function setAct(v){ el('act').value = v; upd(); }
 function upd(){
-  const a = parseAction($('actionInput').value);
-  const d = $('detect');
-  d.className = 'detect ' + a.cls;
-  d.innerHTML = a.type==='none' ? '' : `<i class="${a.icon.includes(' ')?a.icon:'fas '+a.icon}"></i> ${esc(a.label)}` + (a.type!=='invalid' ? ` • ${resolveOpenIn(a.type)==='webview'?'ऐप में खुलेगा':'बाहर खुलेगा'}` : '');
-  const t = $('pushTitle').value.trim(), b = $('pushBody').value.trim(), img = $('pushImage').value.trim();
-  $('pT').textContent = t || 'शीर्षक यहाँ दिखेगा…';
-  $('pB').textContent = b || 'आपका संदेश यहाँ दिखेगा…';
-  $('pLink').textContent = a.url || '—';
-  $('pIcon').className = a.icon.includes(' ') ? a.icon : 'fas ' + a.icon;
-  $('pLoud').classList.toggle('d-none', !$('loudSwitch').checked);
-  $('cntT').textContent = t.length + '/65'; $('cntT').style.color = t.length>65 ? '#FBBF24' : '';
-  $('cntB').textContent = b.length + '/240'; $('cntB').style.color = b.length>240 ? '#FBBF24' : '';
-  const pi = $('pI');
-  if(/^https?:\/\//i.test(img)){ pi.src = img; pi.style.display = 'block'; pi.onerror = () => pi.style.display = 'none'; }
-  else pi.style.display = 'none';
+  const a = parseAction(el('act').value), d = el('detect');
+  d.className = 'detect ' + a.cls; d.innerHTML = detectHTML(a, true);
+  const t = el('title').value.trim(), b = el('body').value.trim(), im = el('img').value.trim();
+  el('pT').textContent = t || 'शीर्षक यहाँ दिखेगा';
+  el('pB').textContent = b || 'आपका संदेश यहाँ दिखेगा';
+  el('pL').textContent = a.url || 'कोई लिंक नहीं चुना';
+  el('pIc').className = ic(a.icon);
+  el('pLoud').style.display = el('loud').checked ? 'inline' : 'none';
+  el('cT').textContent = t.length + '/65'; el('cT').style.color = t.length>65 ? '#F5C56E' : '';
+  el('cB').textContent = b.length + '/240'; el('cB').style.color = b.length>240 ? '#F5C56E' : '';
+  const pi = el('pI');
+  if(/^https?:\/\//i.test(im)){ pi.src = im; pi.style.display = 'block'; pi.onerror = () => pi.style.display = 'none'; } else pi.style.display = 'none';
 }
+function tick(){ el('clk').textContent = new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:false}); }
 
-function renderChips(){
-  const pages = store.get('fcm_pages', DEFAULT_PAGES);
-  $('pageChips').innerHTML = pages.map((p,i) =>
-    `<span class="chip" onclick="setAction(${JSON.stringify(p).replace(/"/g,'&quot;')})"><i class="fas fa-file-code"></i>${esc(p)}<span class="x" onclick="event.stopPropagation();delPage(${i})"><i class="fas fa-xmark"></i></span></span>`
-  ).join('') + `<span class="chip" onclick="addPage()"><i class="fas fa-plus"></i> जोड़ें</span>`;
-  const tpls = store.get('fcm_tpls', []);
-  const all = [...TEMPLATES, ...tpls];
-  $('tplChips').innerHTML = all.map((t,i) =>
-    `<span class="chip" onclick="loadTpl(${i})">${esc(t.n)}${i>=TEMPLATES.length?`<span class="x" onclick="event.stopPropagation();delTpl(${i-TEMPLATES.length})"><i class="fas fa-xmark"></i></span>`:''}</span>`
-  ).join('');
+/* ---------- Link library ---------- */
+const DEFAULT_LIB = [
+  ['होम','index.html'],['होम डैशबोर्ड','home.html'],['दैनिक दर्शन','daily_darshan.html'],['ग्लोबल जप','global_jap.html'],
+  ['एकादशी कैलेंडर','calendar.html'],['दान / सेवा','dono.html'],['आरती पुस्तक','aarti-pustak.html']
+].map(([name,value]) => ({id:'d'+value, name, value}));
+let lib = store.get('fcm_lib', null);
+if(!lib){
+  const old = store.get('fcm_pages', null);
+  lib = old ? old.map(v => ({id:'m'+v, name:v.replace(/\.html?$/i,''), value:v})) : DEFAULT_LIB;
+  store.set('fcm_lib', lib);
 }
-function addPage(){
-  const raw = $('actionInput').value.trim();
-  const a = parseAction(raw);
-  let v = a.type==='page' ? a.url.split(/[?#]/)[0] : prompt('नई फ़ाइल का नाम (जैसे: seva.html)');
-  if(!v) return;
-  const p = parseAction(v);
-  if(p.type!=='page') return alert('यह फ़ाइल का नाम नहीं लग रहा।');
-  const pages = store.get('fcm_pages', DEFAULT_PAGES);
-  if(!pages.includes(p.url)) pages.push(p.url);
-  store.set('fcm_pages', pages); renderChips();
+let editId = null;
+function renderLib(){
+  const pages = lib.filter(x => parseAction(x.value).type==='page');
+  const links = lib.filter(x => parseAction(x.value).type!=='page');
+  const row = (list) => list.map(x => `<button type="button" class="chip" data-v="${esc(x.value)}" title="${esc(x.value)}"><i class="${ic(parseAction(x.value).icon)}"></i><span>${esc(x.name)}</span></button>`).join('');
+  el('libChips').innerHTML = (pages.length ? `<div class="chips" style="width:100%">${row(pages)}</div>` : '') + (links.length ? `<div class="chips" style="width:100%">${row(links)}</div>` : '') +
+    `<button type="button" class="chip add" onclick="openLib()"><i class="fas fa-plus"></i><span>नया जोड़ें</span></button>`;
+  el('libList').innerHTML = lib.length ? lib.map(x => { const a = parseAction(x.value); return `
+    <div class="li"><i class="t ${ic(a.icon)}"></i><div><b>${esc(x.name)}</b><small>${esc(x.value)}</small></div>
+    <button type="button" title="बदलें" data-edit="${esc(x.id)}"><i class="fas fa-pen"></i></button>
+    <button type="button" class="d" title="हटाएँ" data-del="${esc(x.id)}"><i class="fas fa-trash"></i></button></div>`; }).join('')
+    : '<div class="empty">अभी कुछ सेव नहीं है। नीचे से पहला जोड़ें।</div>';
 }
-function delPage(i){ const p = store.get('fcm_pages', DEFAULT_PAGES); p.splice(i,1); store.set('fcm_pages', p); renderChips(); }
-function loadTpl(i){
-  const t = [...TEMPLATES, ...store.get('fcm_tpls', [])][i]; if(!t) return;
-  $('pushTitle').value = t.t; $('pushBody').value = t.b; setAction(t.a);
-  $('loudSwitch').checked = !!t.loud;
-  const known = ['all','darshan','test'];
-  if(known.includes(t.topic)) { $('topicSel').value = t.topic; } else { $('topicSel').value = '__custom'; $('topicCustom').value = t.topic || ''; }
-  onTopic();
+el('libChips').addEventListener('click', e => { const c = e.target.closest('[data-v]'); if(c) setAct(c.dataset.v); });
+el('libList').addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]'), dl = e.target.closest('[data-del]');
+  if(ed){ const x = lib.find(i => i.id===ed.dataset.edit); if(x){ editId = x.id; el('lName').value = x.name; el('lVal').value = x.value; el('addLabel').textContent = 'बदलाव करें'; libDetect(); } }
+  if(dl && confirm('यह एंट्री हटाएँ?')){ lib = lib.filter(i => i.id!==dl.dataset.del); store.set('fcm_lib', lib); renderLib(); }
+});
+function openLib(prefill){
+  editId = null; el('addLabel').textContent = 'नया जोड़ें'; el('lName').value = '';
+  el('lVal').value = (prefill && parseAction(prefill).type!=='invalid') ? prefill : '';
+  libDetect(); renderLib(); el('libSheet').classList.add('on');
+  setTimeout(() => (el('lVal').value ? el('lName') : el('lVal')).focus(), 50);
 }
-function saveTpl(){
-  const name = prompt('टेम्पलेट का नाम?'); if(!name) return;
-  const tpls = store.get('fcm_tpls', []);
-  tpls.push({n:'⭐ '+name, t:$('pushTitle').value, b:$('pushBody').value, a:$('actionInput').value, topic:topicValue(), loud:$('loudSwitch').checked});
-  store.set('fcm_tpls', tpls); renderChips();
+function closeLib(){ el('libSheet').classList.remove('on'); }
+function cancelEdit(){ editId = null; el('lName').value = ''; el('lVal').value = ''; el('addLabel').textContent = 'नया जोड़ें'; libDetect(); }
+function libDetect(){ const a = parseAction(el('lVal').value); el('lDetect').className = 'detect ' + a.cls; el('lDetect').innerHTML = detectHTML(a, false); }
+function saveLib(){
+  const a = parseAction(el('lVal').value);
+  if(a.type==='none' || a.type==='invalid') return toast('सही फ़ाइल का नाम या लिंक लिखें');
+  const name = el('lName').value.trim() || a.url.replace(/^https?:\/\/(www\.)?/,'').slice(0,28);
+  if(editId){ const x = lib.find(i => i.id===editId); x.name = name; x.value = a.url; }
+  else{
+    if(lib.some(i => i.value===a.url)) return toast('यह पहले से लाइब्रेरी में है');
+    lib.push({id:'u'+Date.now(), name, value:a.url});
+  }
+  store.set('fcm_lib', lib); cancelEdit(); renderLib(); toast('लाइब्रेरी में सेव हो गया');
 }
-function delTpl(i){ const t = store.get('fcm_tpls', []); t.splice(i,1); store.set('fcm_tpls', t); renderChips(); }
-function resetForm(){ $('pushForm').reset(); $('topicCustom').classList.add('d-none'); upd(); }
-
-/* ---------- Admin key ---------- */
-function openKey(){ $('keyInput').value = store.get('fcm_admin_key',''); $('keySheet').classList.add('on'); }
-function closeKey(){ $('keySheet').classList.remove('on'); }
-function saveKey(){ store.set('fcm_admin_key', $('keyInput').value.trim()); closeKey(); checkGateway(); }
-
-async function checkGateway(){
-  const b = $('gwBadge');
+function exportLib(){ navigator.clipboard?.writeText(JSON.stringify(lib)).then(() => toast('कॉपी हो गया'), () => toast('कॉपी नहीं हो सका')); }
+function importLib(){
+  const s = prompt('एक्सपोर्ट किया हुआ JSON यहाँ पेस्ट करें'); if(!s) return;
   try{
-    const r = await fetch('/api/send-push', {method:'GET', headers:{'x-admin-key': store.get('fcm_admin_key','')}});
-    const d = await r.json().catch(()=>({}));
-    if(r.ok){ b.className='badge bg-success px-3 py-2'; b.innerHTML='<i class="fas fa-wifi me-1"></i> Gateway: Active'; }
-    else if(r.status===401){ b.className='badge bg-warning text-dark px-3 py-2'; b.innerHTML='<i class="fas fa-lock me-1"></i> Admin Key ग़लत/खाली'; }
-    else { b.className='badge bg-danger px-3 py-2'; b.innerHTML='<i class="fas fa-triangle-exclamation me-1"></i> '+esc(d.reason||'Gateway Error'); }
-  }catch{ b.className='badge bg-danger px-3 py-2'; b.innerHTML='<i class="fas fa-plug-circle-xmark me-1"></i> Offline'; }
+    const arr = JSON.parse(s); if(!Array.isArray(arr)) throw 0;
+    let n = 0;
+    arr.forEach(x => { const a = parseAction(x && x.value); if(a.type!=='none' && a.type!=='invalid' && !lib.some(i => i.value===a.url)){ lib.push({id:'i'+Date.now()+n, name:String(x.name||a.url).slice(0,40), value:a.url}); n++; } });
+    store.set('fcm_lib', lib); renderLib(); toast(n + ' एंट्री जुड़ीं');
+  }catch{ toast('JSON सही नहीं है'); }
+}
+
+/* ---------- Templates (हिंदी / मराठी / English) ---------- */
+const CATS=[['daily','दैनिक'],['fest','एकादशी व उत्सव'],['live','लाइव'],['seva','सेवा'],['info','सूचना'],['mine','मेरे टेम्पलेट']];
+const LANGS=[['hi','हिंदी'],['mr','मराठी'],['en','English'],['all','तीनों']];
+const T=[
+['daily',['मंगल आरती','मंगल आरती','Mangala Aarti'],['🌅 मंगल आरती का समय हो गया','🌅 मंगल आरतीची वेळ झाली','🌅 Mangala Aarti is starting'],['श्री श्री राधा कृष्ण चंद्र की मंगल आरती के दर्शन करें। हरे कृष्ण! 🙏','श्री श्री राधा कृष्ण चंद्र यांच्या मंगल आरतीचे दर्शन घ्या. हरे कृष्ण! 🙏',"Take darshan of Sri Sri Radha Krishna Chandra's Mangala Aarti. Hare Krishna! 🙏"],'daily_darshan.html','darshan',false],
+['daily',['श्रृंगार दर्शन','शृंगार दर्शन','Shringar Darshan'],['🌸 आज के श्रृंगार दर्शन','🌸 आजचे शृंगार दर्शन',"🌸 Today's Shringar Darshan"],['आज प्रभु का सुंदर श्रृंगार दर्शन उपलब्ध है। दर्शन के लिए टैप करें।','आज प्रभूंचे सुंदर शृंगार दर्शन उपलब्ध आहे. दर्शनासाठी टॅप करा.',"Today's beautiful Shringar Darshan of the Lord is ready. Tap to have darshan."],'daily_darshan.html','darshan',false],
+['daily',['संध्या आरती','संध्या आरती','Sandhya Aarti'],['🪔 संध्या आरती का समय','🪔 संध्या आरतीची वेळ','🪔 Sandhya Aarti time'],['संध्या आरती में सम्मिलित हों और प्रभु का आशीर्वाद पाएँ।','संध्या आरतीत सहभागी व्हा आणि प्रभूंचा आशीर्वाद घ्या.',"Join the evening aarti and receive the Lord's blessings."],'daily_darshan.html','darshan',false],
+['daily',['शयन आरती / शुभ रात्रि','शयन आरती / शुभ रात्री','Shayan Aarti / Good night'],['🌙 शयन आरती व शुभ रात्रि','🌙 शयन आरती व शुभ रात्री','🌙 Shayan Aarti & good night'],['प्रभु विश्राम कर रहे हैं। आपकी रात्रि मंगलमय हो। हरे कृष्ण! 🙏','प्रभू विश्रांती घेत आहेत. तुमची रात्र मंगलमय जावो. हरे कृष्ण! 🙏','The Lord is resting. May your night be peaceful. Hare Krishna! 🙏'],'daily_darshan.html','darshan',false],
+['daily',['शुभ प्रभात','शुभ प्रभात','Good morning'],['🙏 हरे कृष्ण! शुभ प्रभात','🙏 हरे कृष्ण! शुभ प्रभात','🙏 Hare Krishna! Good morning'],['आपका दिन कृष्ण भक्ति से भरा हो। आज की शुरुआत हरिनाम से करें।','तुमचा दिवस कृष्णभक्तीने भरलेला जावो. आजची सुरुवात हरिनामाने करा.','May your day be filled with Krishna bhakti. Begin today with the Holy Name.'],'home.html','all',false],
+['daily',['जप स्मरण','जप स्मरण','Japa reminder'],['📿 आज की माला पूरी की?','📿 आजची माळा पूर्ण केली का?',"📿 Completed today's japa?"],['हरे कृष्ण महामंत्र का जप करें और ग्लोबल जप में जुड़ें।','हरे कृष्ण महामंत्राचा जप करा आणि ग्लोबल जपात सहभागी व्हा.','Chant the Hare Krishna Maha-mantra and join the Global Japa.'],'global_jap.html','all',false],
+['daily',['गीता श्लोक','गीता श्लोक','Gita verse'],['📖 आज का गीता श्लोक','📖 आजचा गीता श्लोक',"📖 Today's Gita verse"],['भगवद्गीता का आज का श्लोक पढ़ें और उस पर मनन करें।','भगवद्गीतेतील आजचा श्लोक वाचा आणि त्यावर चिंतन करा.',"Read today's verse from the Bhagavad Gita and reflect on it."],'home.html','all',false],
+['fest',['कल एकादशी','उद्या एकादशी','Ekadashi tomorrow'],['🌙 कल एकादशी है','🌙 उद्या एकादशी आहे','🌙 Tomorrow is Ekadashi'],['व्रत की विधि, नियम और पारण का समय देखें।','व्रताची पद्धत, नियम आणि पारणाची वेळ पाहा.','See the fasting rules and the parana (fast-breaking) time.'],'calendar.html','all',false],
+['fest',['आज एकादशी','आज एकादशी','Ekadashi today'],['🌙 आज एकादशी — हरिनाम जप करें','🌙 आज एकादशी — हरिनाम जप करा','🌙 Ekadashi today — chant more'],['आज अन्न (अनाज) का त्याग करें और अधिक से अधिक जप व कीर्तन करें।','आज धान्याचा त्याग करा आणि जास्तीत जास्त जप व कीर्तन करा.','Avoid grains today and chant and sing kirtan as much as you can.'],'calendar.html','all',false],
+['fest',['पारण समय','पारण वेळ','Parana time'],['🍚 एकादशी पारण का समय','🍚 एकादशी पारणाची वेळ','🍚 Ekadashi parana time'],['आज निर्धारित समय में व्रत का पारण करें। समय देखने के लिए टैप करें।','आज ठरलेल्या वेळेत व्रताचे पारण करा. वेळ पाहण्यासाठी टॅप करा.','Break your fast today within the prescribed time. Tap to see the timing.'],'calendar.html','all',false],
+['fest',['कल उत्सव','उद्या उत्सव','Festival tomorrow'],['🎉 कल [उत्सव का नाम] महोत्सव','🎉 उद्या [उत्सवाचे नाव] महोत्सव','🎉 Tomorrow: [Festival name]'],['सभी भक्त मंदिर पधारें और उत्सव में सम्मिलित हों। विवरण के लिए टैप करें।','सर्व भक्तांनी मंदिरात यावे आणि उत्सवात सहभागी व्हावे. तपशीलासाठी टॅप करा.','All devotees are invited to the temple to join the festival. Tap for details.'],'calendar.html','all',false],
+['fest',['उत्सव शुभकामना','उत्सव शुभेच्छा','Festival greeting'],['🌺 [उत्सव] की हार्दिक शुभकामनाएँ','🌺 [उत्सव] च्या हार्दिक शुभेच्छा','🌺 Happy [Festival]!'],['श्री श्री राधा कृष्ण चंद्र की कृपा आप पर सदा बनी रहे। हरे कृष्ण!','श्री श्री राधा कृष्ण चंद्र यांची कृपा तुमच्यावर सदैव राहो. हरे कृष्ण!','May the mercy of Sri Sri Radha Krishna Chandra always be upon you. Hare Krishna!'],'home.html','all',false],
+['live',['लाइव आरती','लाइव्ह आरती','Live aarti'],['🔴 लाइव आरती शुरू हो चुकी है','🔴 लाइव्ह आरती सुरू झाली आहे','🔴 Live aarti has started'],['अभी लाइव दर्शन करें। YouTube पर जुड़ें।','आत्ता लाइव्ह दर्शन घ्या. YouTube वर जोडले जा.','Have darshan live now. Join us on YouTube.'],'https://youtube.com/live/','all',true],
+['live',['लाइव कीर्तन','लाइव्ह कीर्तन','Live kirtan'],['🎶 लाइव कीर्तन आरंभ','🎶 लाइव्ह कीर्तन सुरू','🎶 Live kirtan has begun'],['हरिनाम संकीर्तन में जुड़ें और आनंद लें।','हरिनाम संकीर्तनात सहभागी व्हा आणि आनंद घ्या.','Join the Harinam Sankirtan and feel the joy.'],'https://youtube.com/live/','all',false],
+['seva',['सेवा अपील','सेवा आवाहन','Seva appeal'],['🙏 मंदिर सेवा में सहभागी बनें','🙏 मंदिर सेवेत सहभागी व्हा','🙏 Take part in temple seva'],['आपकी छोटी सी सेवा भी प्रभु को अत्यंत प्रिय है। सेवा के लिए टैप करें।','तुमची छोटीशी सेवाही प्रभूंना अतिशय प्रिय आहे. सेवेसाठी टॅप करा.','Even a small seva is very dear to the Lord. Tap to offer your seva.'],'dono.html','all',false],
+['seva',['धन्यवाद','धन्यवाद','Thank you'],['🌼 आपकी सेवा के लिए धन्यवाद','🌼 तुमच्या सेवेबद्दल धन्यवाद','🌼 Thank you for your seva'],['आपका योगदान प्राप्त हुआ। प्रभु आपको आशीर्वाद दें। हरे कृष्ण!','तुमचे योगदान प्राप्त झाले. प्रभू तुम्हाला आशीर्वाद देवोत. हरे कृष्ण!','Your contribution has been received. May the Lord bless you. Hare Krishna!'],'home.html','all',false],
+['info',['समय बदलाव','वेळेत बदल','Timing change'],['⏰ मंदिर के समय में बदलाव','⏰ मंदिराच्या वेळेत बदल','⏰ Temple timing change'],['आज दर्शन व आरती के समय में परिवर्तन है। नया समय देखें।','आज दर्शन व आरतीच्या वेळेत बदल आहे. नवीन वेळ पाहा.','Darshan and aarti timings are changed today. Check the new schedule.'],'daily_darshan.html','all',false],
+['info',['ऐप अपडेट','ॲप अपडेट','App update'],['📲 ऐप का नया अपडेट आया है','📲 ॲपचे नवीन अपडेट आले आहे','📲 New app update available'],['नए फीचर्स के लिए Play Store से ऐप अपडेट करें।','नवीन फीचर्ससाठी Play Store वरून ॲप अपडेट करा.','Update the app from the Play Store to get the new features.'],'https://play.google.com/store/apps/details?id=','all',false]
+].map(x=>({cat:x[0],n:x[1],t:x[2],b:x[3],a:x[4],topic:x[5],loud:x[6]}));
+
+let curLang=store.get('fcm_lang','hi'), curCat='daily', lastFill=null;
+const li=()=>['hi','mr','en'].indexOf(curLang);
+const pick=(v)=>Array.isArray(v)?(curLang==='all'?v[0]:v[li()]):v;
+function listFor(cat){ return cat==='mine' ? store.get('fcm_tpls',[]).map((x,i)=>({...x,mi:i})) : T.filter(x=>x.cat===cat); }
+function renderTpl(){
+  el('langSeg').innerHTML=LANGS.map(([k,n])=>`<button type="button" data-lang="${k}" class="${k===curLang?'on':''}">${n}</button>`).join('');
+  el('catSeg').innerHTML=CATS.map(([k,n])=>`<button type="button" data-cat="${k}" class="${k===curCat?'on':''}">${n}</button>`).join('');
+  const L=listFor(curCat);
+  el('tplChips').innerHTML=L.length?L.map((t,i)=>`<button type="button" class="chip" data-t="${i}"><span>${esc(pick(t.n))}</span>${t.mi!==undefined?`<i class="fas fa-xmark" data-x="${t.mi}" title="हटाएँ" style="color:var(--mute)"></i>`:''}</button>`).join(''):'<div class="empty" style="grid-column:1/-1">अभी कोई टेम्पलेट नहीं। संदेश लिखकर "टेम्पलेट सेव" दबाएँ।</div>';
+}
+function fillTpl(t){
+  const title=pick(t.t), body=(Array.isArray(t.b)&&curLang==='all'?t.b.join('\n\n'):pick(t.b)).slice(0,400);
+  el('title').value=title; el('body').value=body; el('loud').checked=!!t.loud; setTopic(t.topic); setAct(t.a);
+  lastFill={t,title,body};
+  if(/\[.+?\]/.test(title+body)) toast('[ ] वाली जगह अपना नाम भरें');
+}
+el('langSeg').addEventListener('click',e=>{
+  const b=e.target.closest('[data-lang]'); if(!b) return;
+  curLang=b.dataset.lang; store.set('fcm_lang',curLang); renderTpl();
+  if(lastFill && el('title').value===lastFill.title && el('body').value===lastFill.body) fillTpl(lastFill.t);
+});
+el('catSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-cat]'); if(b){ curCat=b.dataset.cat; renderTpl(); } });
+el('tplChips').addEventListener('click',e=>{
+  const x=e.target.closest('[data-x]');
+  if(x){ e.stopPropagation(); const a=store.get('fcm_tpls',[]); a.splice(+x.dataset.x,1); store.set('fcm_tpls',a); return renderTpl(); }
+  const c=e.target.closest('[data-t]'); if(c) fillTpl(listFor(curCat)[+c.dataset.t]);
+});
+function setTopic(v){ if(['all','darshan','test'].includes(v)) el('topicSel').value = v; else { el('topicSel').value = '__c'; el('topicC').value = v || ''; } onTopic(); }
+function saveTpl(){
+  const n = prompt('टेम्पलेट का नाम?'); if(!n) return;
+  const a = store.get('fcm_tpls', []);
+  a.push({n, t:el('title').value, b:el('body').value, a:el('act').value, topic:topicVal(), loud:el('loud').checked});
+  store.set('fcm_tpls', a); renderTpl(); toast('टेम्पलेट सेव हो गया');
+}
+function resetForm(){ el('form').reset(); el('topicC').style.display = 'none'; upd(); }
+
+/* ---------- Admin key & gateway ---------- */
+function openKey(){ el('keyIn').value = store.get('fcm_admin_key',''); el('keySheet').classList.add('on'); }
+function closeKey(){ el('keySheet').classList.remove('on'); }
+function saveKey(){ store.set('fcm_admin_key', el('keyIn').value.trim()); closeKey(); toast('Key सेव हो गई'); }
+async function checkGateway(){
+  const g = el('gw'), s = g.lastElementChild;
+  try{ const r = await fetch('/api/send-push', {method:'OPTIONS'}); if(!r.ok) throw 0; g.className='status ok'; s.textContent='गेटवे चालू'; }
+  catch{ g.className='status no'; s.textContent='गेटवे से जुड़ नहीं पा रहे'; }
 }
 
 /* ---------- Send ---------- */
-async function handleSend(e){
+function showDiag(cls, html){ const d = el('diag'); d.style.display = 'block'; d.className = 'diag ' + cls; d.innerHTML = html; }
+async function send(e){
   e.preventDefault();
-  const a = parseAction($('actionInput').value);
-  const diag = $('diag'), btn = $('submitBtn');
-  const show = (cls, head, msg, why) => {
-    diag.className = 'diag ' + cls; $('dHead').innerHTML = head; $('dMsg').innerHTML = msg; $('dWhy').textContent = why || '';
-    $('dTime').textContent = new Date().toLocaleTimeString();
-  };
-  if(a.type==='none'){ show('e','<i class="fas fa-times-circle"></i> रुका','क्लिक एक्शन खाली है','कोई फ़ाइल का नाम (dono.html) या लिंक लिखें।'); return; }
-  if(a.type==='invalid'){ show('e','<i class="fas fa-times-circle"></i> रुका','लिंक सही नहीं है', a.label); return; }
-  const topic = topicValue();
-  if(!topic){ show('e','<i class="fas fa-times-circle"></i> रुका','Topic खाली है','कस्टम topic का नाम लिखें।'); return; }
-  if($('topicSel').value==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण (all) को जाएगा। भेजें?')) return;
+  const a = parseAction(el('act').value);
+  if(a.type==='none') return showDiag('e','क्लिक पर खुलने वाली फ़ाइल या लिंक खाली है। जैसे: <b>dono.html</b> या YouTube लिंक लिखें।');
+  if(a.type==='invalid') return showDiag('e','लिंक सही नहीं है: ' + esc(a.label));
+  const topic = topicVal();
+  if(!topic) return showDiag('e','Topic का नाम खाली है।');
+  if(topic==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण को जाएगा। भेजें?')) return;
 
-  const payload = {
-    title: $('pushTitle').value.trim(), body: $('pushBody').value.trim(), imageUrl: $('pushImage').value.trim(),
-    actionUrl: a.url, actionType: a.type, openIn: resolveOpenIn(a.type),
-    topic, isLoudAlert: $('loudSwitch').checked, priority: $('priority').value
-  };
-
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेजा जा रहा है…';
-  diag.classList.remove('d-none'); show('', 'SENDING…', 'अनुरोध प्रोसेस हो रहा है…');
+  const payload = { title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
+    actionUrl:a.url, actionType:a.type, openIn:openMode(a.type), topic, isLoudAlert:el('loud').checked, priority:el('priority').value };
+  const btn = el('sendBtn'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं…';
+  showDiag('', 'FCM को भेजा जा रहा है…');
   try{
     const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify(payload)});
-    const d = await r.json().catch(()=>({}));
+    const d = await r.json().catch(() => ({}));
     if(r.ok && d.success){
-      show('s','<i class="fas fa-check-circle text-success"></i> SUCCESS', `भेज दिया गया!<br><small style="color:#A7F3D0">${esc(d.targetLink||a.url)} • ${d.isLoud?'🚨 LOUD':'सामान्य'} • ${esc(payload.openIn)}</small>`, `Topic "${d.targetTopic||topic}" पर डिलीवर।${d.messageId?' ID: '+d.messageId:''}`);
-      addHist(payload, 'Success');
-    } else {
-      const hint = r.status===401 ? 'ऊपर "Admin Key" में सही key डालें।' : (d.details || 'कोई विवरण नहीं।');
-      show('e','<i class="fas fa-times-circle text-danger"></i> FAILED', `कारण: <b>${esc(d.reason || 'त्रुटि '+r.status)}</b>`, hint);
-      addHist(payload, 'Failed');
+      showDiag('s', `✔ भेज दिया गया<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
+      addHist(payload,'Success');
+    }else{
+      showDiag('e', `✖ नहीं गया<br>कारण: ${esc(d.reason||('त्रुटि '+r.status))}<br>${esc(d.details||'')}`);
+      addHist(payload,'Failed');
     }
-  }catch(err){
-    show('e','<i class="fas fa-triangle-exclamation text-danger"></i> GATEWAY ERROR','/api/send-push से कनेक्ट नहीं हो सका।', err.message);
-    addHist(payload, 'Gateway Error');
-  }finally{
-    btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें';
-  }
+  }catch(err){ showDiag('e', `✖ गेटवे से जुड़ नहीं सके<br>${esc(err.message)}`); addHist(payload,'Error'); }
+  finally{ btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> नोटिफिकेशन भेजें'; }
 }
 
 /* ---------- History ---------- */
 function addHist(p, status){
   const h = store.get('fcm_push_history', []);
-  h.unshift({p, status, time: new Date().toLocaleString('hi-IN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})});
+  h.unshift({p, status, time:new Date().toLocaleString('hi-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})});
   store.set('fcm_push_history', h.slice(0,15)); renderHist();
 }
 function renderHist(){
   const h = store.get('fcm_push_history', []);
-  $('hist').innerHTML = h.length ? h.map((x,i) => `
-    <div class="hrow" onclick="reuse(${i})">
-      <div style="min-width:0">
-        <div class="fw-bold text-truncate">${esc(x.p.title)}</div>
-        <small style="color:${x.status==='Success'?'#34D399':'#F87171'};font-weight:700">${esc(x.status)}</small>
-        <small class="text-muted text-break"> • ${esc(x.p.actionUrl)}</small>
-      </div>
-      <div class="text-muted text-end" style="font-size:.7rem;white-space:nowrap">${esc(x.time)}<br>${esc(x.p.topic)}</div>
-    </div>`).join('') : '<div class="text-center text-muted small py-3">कोई हालिया लॉग नहीं है।</div>';
+  el('hist').innerHTML = h.length ? h.map((x,i) => {
+    const p = x.p || {title:x.title, actionUrl:x.link, topic:''};
+    return `<div class="hrow" data-h="${i}"><div style="min-width:0"><b>${esc(p.title)}</b><small class="${x.status==='Success'?'okc':'badc'}">${esc(x.status)}</small> <small>· ${esc(p.actionUrl||'')}</small></div><div class="r">${esc(x.time)}<br>${esc(p.topic||'')}</div></div>`;
+  }).join('') : '<div class="empty">अभी कोई ब्रॉडकास्ट नहीं भेजा गया।</div>';
 }
-function reuse(i){
-  const x = store.get('fcm_push_history', [])[i]; if(!x) return;
-  $('pushTitle').value = x.p.title; $('pushBody').value = x.p.body; $('pushImage').value = x.p.imageUrl || '';
-  $('loudSwitch').checked = !!x.p.isLoudAlert; $('priority').value = x.p.priority || 'high';
-  const known = ['all','darshan','test'];
-  if(known.includes(x.p.topic)) $('topicSel').value = x.p.topic; else { $('topicSel').value='__custom'; $('topicCustom').value = x.p.topic; }
-  onTopic(); setAction(x.p.actionUrl); window.scrollTo({top:0,behavior:'smooth'});
-}
+el('hist').addEventListener('click', e => {
+  const r = e.target.closest('[data-h]'); if(!r) return;
+  const x = store.get('fcm_push_history', [])[+r.dataset.h]; if(!x || !x.p) return;
+  el('title').value = x.p.title; el('body').value = x.p.body || ''; el('img').value = x.p.imageUrl || '';
+  el('loud').checked = !!x.p.isLoudAlert; el('priority').value = x.p.priority || 'high'; setTopic(x.p.topic); setAct(x.p.actionUrl);
+  window.scrollTo({top:0, behavior:'smooth'}); toast('पुराना ब्रॉडकास्ट लोड हुआ');
+});
 function clearHist(){ localStorage.removeItem('fcm_push_history'); renderHist(); }
 
-document.addEventListener('DOMContentLoaded', () => { renderChips(); renderHist(); upd(); checkGateway(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeLib(); closeKey(); } });
+renderLib(); renderTpl(); renderHist(); upd(); tick(); setInterval(tick, 30000); checkGateway();
 </script>
 </body>
 </html>
