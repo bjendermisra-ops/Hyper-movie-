@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notification Command Center - Sri Sri Radha Krishna Chandra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@600;800&family=Cinzel:wght@800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+:root{--primary:#FF9933;--primary-dark:#E65100;--bg:#0C0F17;--card:#141824;--bd:#22293A;--ok:#10B981;--bad:#EF4444;--mute:#94A3B8;--txt:#F8FAFC}
+body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt);min-height:100vh;padding:20px 14px 80px}
+.header-bar{max-width:1200px;margin:0 auto 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:16px}
+.brand-title{font-family:'Cinzel',serif;font-weight:900;font-size:1.3rem;color:var(--primary);margin:0}
+.app-container{max-width:1200px;margin:0 auto}
+.custom-card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.card-h{font-size:1.05rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd);padding-bottom:12px}
+.form-label{font-size:.78rem;font-weight:700;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between}
+.ci,.cs,.ct{width:100%;background:#080A10;border:1.5px solid var(--bd);border-radius:12px;color:#fff;padding:11px 13px;font-size:.92rem;font-weight:600;outline:none;transition:.2s;margin-bottom:14px}
+.ci:focus,.cs:focus,.ct:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(255,153,51,.2)}
+.cs option{background:#080A10}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
+.chip{background:#0E121B;border:1px solid var(--bd);color:#CBD5E1;font-size:.74rem;font-weight:700;padding:5px 10px;border-radius:999px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip:hover{border-color:var(--primary);color:var(--primary)}
+.chip .x{opacity:.5;font-size:.7rem}.chip .x:hover{opacity:1;color:var(--bad)}
+.detect{font-size:.78rem;font-weight:700;margin:-8px 0 14px;display:flex;align-items:center;gap:8px;min-height:20px}
+.detect.good{color:#34D399}.detect.warn{color:#FBBF24}.detect.err{color:#F87171}
+.loud-box{background:rgba(239,68,68,.08);border:1.5px dashed rgba(239,68,68,.4);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.form-check-input:checked{background-color:var(--bad);border-color:var(--bad)}
+.send-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));border:none;color:#fff;padding:15px;border-radius:14px;font-weight:800;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(230,81,0,.4)}
+.send-btn:active{transform:scale(.97)}.send-btn:disabled{opacity:.6}
+.ghost-btn{background:transparent;border:1px solid var(--bd);color:var(--mute);border-radius:10px;font-size:.78rem;font-weight:700;padding:6px 12px}
+.ghost-btn:hover{border-color:var(--primary);color:var(--primary)}
+.preview-box{background:#000;border:2px solid #2B3346;border-radius:30px;padding:16px 12px;max-width:340px;margin:0 auto}
+.notch{width:90px;height:16px;background:#1E2433;border-radius:20px;margin:0 auto 14px}
+.mock{background:#1C2230;border-radius:18px;padding:13px;border:1px solid rgba(255,255,255,.06)}
+.mock-h{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;color:#CBD5E1;margin-bottom:8px}
+.badge-i{width:18px;height:18px;background:var(--primary);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#000;font-size:.65rem}
+.mock-t{font-weight:800;font-size:.95rem;margin-bottom:4px}
+.mock-b{font-size:.82rem;color:var(--mute);line-height:1.4;margin-bottom:10px;white-space:pre-wrap}
+.mock-img{width:100%;height:140px;border-radius:12px;object-fit:cover;display:none;background:#252D3D;margin-bottom:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,153,51,.15);color:var(--primary);font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:6px;word-break:break-all}
+.diag{background:#080A10;border-radius:14px;padding:14px;margin-top:18px;border-left:4px solid #334155;font-family:'JetBrains Mono',monospace;font-size:.8rem}
+.diag.s{border-left-color:var(--ok)}.diag.e{border-left-color:var(--bad);background:rgba(239,68,68,.08)}
+.hrow{background:#0E121B;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;cursor:pointer;font-size:.82rem}
+.hrow:hover{border-color:var(--primary)}
+.sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;align-items:center;justify-content:center;padding:16px}
+.sheet.on{display:flex}.sheet>div{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;max-width:420px;width:100%}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+  <div>
+    <h1 class="brand-title">RADHA KRISHNA CHANDRA</h1>
+    <small style="color:var(--mute);font-weight:700">FCM PUSH NOTIFICATION COMMAND CENTER</small>
+  </div>
+  <div class="d-flex gap-2 align-items-center">
+    <span id="gwBadge" class="badge bg-secondary px-3 py-2"><i class="fas fa-wifi me-1"></i> Gateway: जाँच रहे हैं…</span>
+    <button class="ghost-btn" onclick="openKey()"><i class="fas fa-key"></i> Admin Key</button>
+  </div>
+</div>
+
+<div class="app-container"><div class="row g-4">
+
+<div class="col-12 col-lg-7"><div class="custom-card">
+  <div class="card-h"><i class="fas fa-paper-plane text-warning"></i> नोटिफिकेशन भेजें</div>
+
+  <form id="pushForm" onsubmit="handleSend(event)">
+
+    <label class="form-label">क्विक टेम्पलेट</label>
+    <div class="chips" id="tplChips"></div>
+
+    <div class="row g-2">
+      <div class="col-12 col-md-6">
+        <label class="form-label">टारगेट ऑडियंस (Topic) *</label>
+        <select id="topicSel" class="cs" onchange="onTopic()">
+          <option value="all">🌐 समस्त भक्तगण (all)</option>
+          <option value="darshan">🌸 दैनिक दर्शन (darshan)</option>
+          <option value="test">🧪 टेस्ट (test) — सिर्फ आपके लिए</option>
+          <option value="__custom">✏️ कस्टम topic…</option>
+        </select>
+        <input id="topicCustom" class="ci d-none" placeholder="topic का नाम, जैसे: ekadashi" oninput="upd()">
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label">प्राथमिकता</label>
+        <select id="priority" class="cs">
+          <option value="high">⚡ High (तुरंत)</option>
+          <option value="normal">Normal (बैटरी-फ्रेंडली)</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="form-label"><span>क्लिक पर क्या खुले? (फ़ाइल का नाम या कोई भी लिंक) *</span></label>
+    <input type="text" id="actionInput" class="ci" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="dono.html  |  index.html  |  https://youtube.com/live/…" oninput="upd()">
+    <div class="detect" id="detect"></div>
+
+    <label class="form-label">ऐप में खुले या ब्राउज़र में?</label>
+    <select id="openIn" class="cs" onchange="upd()">
+      <option value="auto">🤖 ऑटो (पेज/वेब → ऐप, YouTube/PlayStore/WhatsApp → बाहर)</option>
+      <option value="webview">📱 हमेशा ऐप के अंदर (WebView)</option>
+      <option value="external">🌐 हमेशा बाहर (ब्राउज़र / संबंधित ऐप)</option>
+    </select>
+
+    <label class="form-label">मेरे सेव किए पेज <small style="font-weight:600;opacity:.7">(टैप = इस्तेमाल)</small></label>
+    <div class="chips" id="pageChips"></div>
+    <div class="chips" id="extChips">
+      <span class="chip" onclick="prefix('https://youtube.com/watch?v=')"><i class="fab fa-youtube text-danger"></i> YouTube</span>
+      <span class="chip" onclick="prefix('https://youtube.com/live/')"><i class="fas fa-circle text-danger"></i> YT Live</span>
+      <span class="chip" onclick="prefix('https://play.google.com/store/apps/details?id=')"><i class="fab fa-google-play text-success"></i> Play Store</span>
+      <span class="chip" onclick="prefix('https://wa.me/91')"><i class="fab fa-whatsapp text-success"></i> WhatsApp</span>
+      <span class="chip" onclick="prefix('tel:+91')"><i class="fas fa-phone"></i> Call</span>
+    </div>
+
+    <div class="loud-box">
+      <div>
+        <div class="fw-bold text-danger"><i class="fas fa-volume-high me-1"></i> सुपर लाउड अलार्म (Mute Bypass)</div>
+        <small style="color:var(--mute);font-size:.75rem">साइलेंट फोन पर भी अलार्म स्ट्रीम में रिंग। ऐप में data-only हैंडल होना ज़रूरी।</small>
+      </div>
+      <div class="form-check form-switch m-0"><input class="form-check-input" type="checkbox" id="loudSwitch" style="width:2.8em;height:1.4em" onchange="upd()"></div>
+    </div>
+
+    <label class="form-label"><span>शीर्षक (Title) *</span><span id="cntT">0/65</span></label>
+    <input type="text" id="pushTitle" class="ci" maxlength="100" placeholder="🔴 लाइव महाआरती शुरू हो चुकी है!" required oninput="upd()">
+
+    <label class="form-label"><span>संदेश (Body) *</span><span id="cntB">0/240</span></label>
+    <textarea id="pushBody" class="ct" rows="3" maxlength="400" placeholder="भक्तों के लिए पावन संदेश…" required oninput="upd()"></textarea>
+
+    <label class="form-label">बैनर फोटो URL (BigPicture)</label>
+    <input type="url" id="pushImage" class="ci" placeholder="https://…/banner.jpg" oninput="upd()">
+
+    <div class="d-flex gap-2">
+      <button type="button" class="ghost-btn" onclick="saveTpl()"><i class="fas fa-bookmark"></i> टेम्पलेट सेव</button>
+      <button type="button" class="ghost-btn" onclick="resetForm()"><i class="fas fa-rotate-left"></i> रीसेट</button>
+    </div>
+    <div style="height:14px"></div>
+
+    <button type="submit" id="submitBtn" class="send-btn"><i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें</button>
+  </form>
+
+  <div id="diag" class="diag d-none">
+    <div class="d-flex justify-content-between"><strong id="dHead"></strong><span id="dTime" style="font-size:.7rem;opacity:.7"></span></div>
+    <div id="dMsg" style="margin-top:6px;font-weight:600"></div>
+    <div id="dWhy" style="margin-top:6px;color:#FCA5A5"></div>
+  </div>
+</div></div>
+
+<div class="col-12 col-lg-5"><div class="custom-card">
+  <div class="card-h justify-content-between"><span><i class="fas fa-mobile-screen text-warning"></i> लाइव प्रीव्यू</span></div>
+  <div class="preview-box">
+    <div class="notch"></div>
+    <div class="mock">
+      <div class="mock-h">
+        <div class="badge-i"><i class="fas fa-bell"></i></div><span>श्री श्री राधाकृष्ण चंद्र</span><span style="opacity:.5">• अभी</span>
+        <span id="pLoud" class="ms-auto text-danger d-none"><i class="fas fa-volume-high"></i> LOUD</span>
+      </div>
+      <div class="mock-t" id="pT">शीर्षक यहाँ दिखेगा…</div>
+      <div class="mock-b" id="pB">आपका संदेश यहाँ दिखेगा…</div>
+      <img id="pI" class="mock-img" alt="">
+      <div class="pill"><i id="pIcon" class="fas fa-link"></i> <span id="pLink">—</span></div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <small class="fw-bold" style="color:var(--mute)">हालिया ब्रॉडकास्ट <span style="font-weight:600">(टैप = दोबारा लोड)</span></small>
+      <button onclick="clearHist()" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size:.75rem">Clear</button>
+    </div>
+    <div id="hist" style="max-height:260px;overflow-y:auto"></div>
+  </div>
+</div></div>
+
+</div></div>
+
+<div class="sheet" id="keySheet"><div>
+  <div class="fw-bold mb-2"><i class="fas fa-key text-warning"></i> Admin Key</div>
+  <small style="color:var(--mute)">यह सिर्फ इसी डिवाइस में सेव होती है और हर रिक्वेस्ट के साथ जाती है, ताकि कोई और आपके endpoint से नोटिफिकेशन न भेज सके। वही key Vercel में ADMIN_KEY रखें।</small>
+  <input type="password" id="keyInput" class="ci mt-3" placeholder="Admin key">
+  <div class="d-flex gap-2"><button class="send-btn" type="button" onclick="saveKey()">सेव करें</button><button class="ghost-btn" type="button" onclick="closeKey()">बंद</button></div>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k, d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const DEFAULT_PAGES = ['index.html','home.html','daily_darshan.html','global_jap.html','calendar.html','dono.html','aarti-pustak.html'];
+const TEMPLATES = [
+  {n:'🔴 लाइव आरती', t:'🔴 लाइव महाआरती शुरू हो चुकी है!', b:'आइए, श्री श्री राधा कृष्ण चंद्र की महाआरती के दर्शन करें। हरे कृष्ण 🙏', a:'https://youtube.com/live/', topic:'all', loud:true},
+  {n:'🌸 दैनिक दर्शन', t:'🌸 आज के दर्शन उपलब्ध हैं', b:'श्री श्री राधा कृष्ण चंद्र के आज के श्रृंगार दर्शन करें।', a:'daily_darshan.html', topic:'darshan', loud:false},
+  {n:'🌙 एकादशी', t:'🌙 कल एकादशी है', b:'व्रत का समय और पारण की जानकारी देखें।', a:'calendar.html', topic:'all', loud:false},
+  {n:'🙏 सेवा / दान', t:'🙏 मंदिर सेवा में सहभागी बनें', b:'आपकी छोटी सी सेवा भी भगवान को प्रिय है।', a:'dono.html', topic:'all', loud:false}
+];
+
+/* ---------- Smart link detection ---------- */
+function parseAction(raw){
+  let v = (raw||'').trim();
+  if(!v) return {type:'none', url:'', label:'लिंक/फ़ाइल का नाम लिखें', icon:'fa-link', cls:'warn'};
+  if(/\s/.test(v)) return {type:'invalid', url:v, label:'नाम/लिंक में space नहीं होना चाहिए', icon:'fa-triangle-exclamation', cls:'err'};
+  if(/^(javascript|data|file):/i.test(v)) return {type:'invalid', url:v, label:'यह लिंक प्रकार सुरक्षित नहीं है', icon:'fa-ban', cls:'err'};
+  if(/^tel:/i.test(v)) return {type:'phone', url:v, label:'फोन कॉल', icon:'fa-phone', cls:'good'};
+  if(/^mailto:/i.test(v)) return {type:'email', url:v, label:'ईमेल', icon:'fa-envelope', cls:'good'};
+  if(/^(upi|market|intent):/i.test(v)) return {type:'deeplink', url:v, label:'डीप लिंक', icon:'fa-link', cls:'good'};
+
+  let isWeb = /^https?:\/\//i.test(v);
+  const domainLike = /^[\w-]+(\.[\w-]+)+(\/|$|\?|#)/.test(v) && !/^[^/?#]+\.html?([?#]|$)/i.test(v);
+  if(!isWeb && domainLike){ v = 'https://' + v; isWeb = true; }
+  if(isWeb){
+    let host = '';
+    try { host = new URL(v).hostname.replace(/^(www|m)\./,''); } catch { return {type:'invalid', url:v, label:'अमान्य URL', icon:'fa-triangle-exclamation', cls:'err'}; }
+    if(/^(youtube\.com|youtu\.be)$/.test(host)) return {type:'youtube', url:v, label:'YouTube', icon:'fa-youtube fab', cls:'good'};
+    if(host==='play.google.com') return {type:'playstore', url:v, label:'Play Store', icon:'fa-google-play fab', cls:'good'};
+    if(/^(wa\.me|whatsapp\.com|chat\.whatsapp\.com)$/.test(host)) return {type:'whatsapp', url:v, label:'WhatsApp', icon:'fa-whatsapp fab', cls:'good'};
+    if(/^(facebook\.com|fb\.watch)$/.test(host)) return {type:'facebook', url:v, label:'Facebook', icon:'fa-facebook fab', cls:'good'};
+    if(/^(instagram\.com)$/.test(host)) return {type:'instagram', url:v, label:'Instagram', icon:'fa-instagram fab', cls:'good'};
+    if(host==='t.me') return {type:'telegram', url:v, label:'Telegram', icon:'fa-telegram fab', cls:'good'};
+    return {type:'web', url:v, label:'वेबसाइट', icon:'fa-globe fas', cls:'good'};
+  }
+  // internal page: dono / dono.html / pages/dono.html?id=2
+  if(/^[\w\-\/.]+([?#].*)?$/.test(v) && !v.startsWith('/') && !v.includes('..')){
+    const m = v.match(/^([^?#]*)(.*)$/);
+    let path = m[1], rest = m[2];
+    let fixed = false;
+    if(!/\.html?$/i.test(path)){ path += '.html'; fixed = true; }
+    return {type:'page', url: path + rest, label: fixed ? `ऐप पेज: ${path} (.html अपने-आप जुड़ा)` : `ऐप पेज: ${path}`, icon:'fa-file-code fas', cls:'good'};
+  }
+  return {type:'invalid', url:v, label:'पहचान नहीं हुई', icon:'fa-triangle-exclamation', cls:'err'};
+}
+function resolveOpenIn(type){
+  const m = $('openIn').value;
+  if(m !== 'auto') return m;
+  return ['page','web'].includes(type) ? 'webview' : 'external';
+}
+
+/* ---------- UI ---------- */
+function topicValue(){ return $('topicSel').value === '__custom' ? $('topicCustom').value.trim().replace(/[^a-zA-Z0-9-_.~%]/g,'') : $('topicSel').value; }
+function onTopic(){ $('topicCustom').classList.toggle('d-none', $('topicSel').value !== '__custom'); upd(); }
+function prefix(p){ $('actionInput').value = p; $('actionInput').focus(); upd(); }
+function setAction(v){ $('actionInput').value = v; upd(); }
+
+function upd(){
+  const a = parseAction($('actionInput').value);
+  const d = $('detect');
+  d.className = 'detect ' + a.cls;
+  d.innerHTML = a.type==='none' ? '' : `<i class="${a.icon.includes(' ')?a.icon:'fas '+a.icon}"></i> ${esc(a.label)}` + (a.type!=='invalid' ? ` • ${resolveOpenIn(a.type)==='webview'?'ऐप में खुलेगा':'बाहर खुलेगा'}` : '');
+  const t = $('pushTitle').value.trim(), b = $('pushBody').value.trim(), img = $('pushImage').value.trim();
+  $('pT').textContent = t || 'शीर्षक यहाँ दिखेगा…';
+  $('pB').textContent = b || 'आपका संदेश यहाँ दिखेगा…';
+  $('pLink').textContent = a.url || '—';
+  $('pIcon').className = a.icon.includes(' ') ? a.icon : 'fas ' + a.icon;
+  $('pLoud').classList.toggle('d-none', !$('loudSwitch').checked);
+  $('cntT').textContent = t.length + '/65'; $('cntT').style.color = t.length>65 ? '#FBBF24' : '';
+  $('cntB').textContent = b.length + '/240'; $('cntB').style.color = b.length>240 ? '#FBBF24' : '';
+  const pi = $('pI');
+  if(/^https?:\/\//i.test(img)){ pi.src = img; pi.style.display = 'block'; pi.onerror = () => pi.style.display = 'none'; }
+  else pi.style.display = 'none';
+}
+
+function renderChips(){
+  const pages = store.get('fcm_pages', DEFAULT_PAGES);
+  $('pageChips').innerHTML = pages.map((p,i) =>
+    `<span class="chip" onclick="setAction(${JSON.stringify(p).replace(/"/g,'&quot;')})"><i class="fas fa-file-code"></i>${esc(p)}<span class="x" onclick="event.stopPropagation();delPage(${i})"><i class="fas fa-xmark"></i></span></span>`
+  ).join('') + `<span class="chip" onclick="addPage()"><i class="fas fa-plus"></i> जोड़ें</span>`;
+  const tpls = store.get('fcm_tpls', []);
+  const all = [...TEMPLATES, ...tpls];
+  $('tplChips').innerHTML = all.map((t,i) =>
+    `<span class="chip" onclick="loadTpl(${i})">${esc(t.n)}${i>=TEMPLATES.length?`<span class="x" onclick="event.stopPropagation();delTpl(${i-TEMPLATES.length})"><i class="fas fa-xmark"></i></span>`:''}</span>`
+  ).join('');
+}
+function addPage(){
+  const raw = $('actionInput').value.trim();
+  const a = parseAction(raw);
+  let v = a.type==='page' ? a.url.split(/[?#]/)[0] : prompt('नई फ़ाइल का नाम (जैसे: seva.html)');
+  if(!v) return;
+  const p = parseAction(v);
+  if(p.type!=='page') return alert('यह फ़ाइल का नाम नहीं लग रहा।');
+  const pages = store.get('fcm_pages', DEFAULT_PAGES);
+  if(!pages.includes(p.url)) pages.push(p.url);
+  store.set('fcm_pages', pages); renderChips();
+}
+function delPage(i){ const p = store.get('fcm_pages', DEFAULT_PAGES); p.splice(i,1); store.set('fcm_pages', p); renderChips(); }
+function loadTpl(i){
+  const t = [...TEMPLATES, ...store.get('fcm_tpls', [])][i]; if(!t) return;
+  $('pushTitle').value = t.t; $('pushBody').value = t.b; setAction(t.a);
+  $('loudSwitch').checked = !!t.loud;
+  const known = ['all','darshan','test'];
+  if(known.includes(t.topic)) { $('topicSel').value = t.topic; } else { $('topicSel').value = '__custom'; $('topicCustom').value = t.topic || ''; }
+  onTopic();
+}
+function saveTpl(){
+  const name = prompt('टेम्पलेट का नाम?'); if(!name) return;
+  const tpls = store.get('fcm_tpls', []);
+  tpls.push({n:'⭐ '+name, t:$('pushTitle').value, b:$('pushBody').value, a:$('actionInput').value, topic:topicValue(), loud:$('loudSwitch').checked});
+  store.set('fcm_tpls', tpls); renderChips();
+}
+function delTpl(i){ const t = store.get('fcm_tpls', []); t.splice(i,1); store.set('fcm_tpls', t); renderChips(); }
+function resetForm(){ $('pushForm').reset(); $('topicCustom').classList.add('d-none'); upd(); }
+
+/* ---------- Admin key ---------- */
+function openKey(){ $('keyInput').value = store.get('fcm_admin_key',''); $('keySheet').classList.add('on'); }
+function closeKey(){ $('keySheet').classList.remove('on'); }
+function saveKey(){ store.set('fcm_admin_key', $('keyInput').value.trim()); closeKey(); checkGateway(); }
+
+async function checkGateway(){
+  const b = $('gwBadge');
+  try{
+    const r = await fetch('/api/send-push', {method:'GET', headers:{'x-admin-key': store.get('fcm_admin_key','')}});
+    const d = await r.json().catch(()=>({}));
+    if(r.ok){ b.className='badge bg-success px-3 py-2'; b.innerHTML='<i class="fas fa-wifi me-1"></i> Gateway: Active'; }
+    else if(r.status===401){ b.className='badge bg-warning text-dark px-3 py-2'; b.innerHTML='<i class="fas fa-lock me-1"></i> Admin Key ग़लत/खाली'; }
+    else { b.className='badge bg-danger px-3 py-2'; b.innerHTML='<i class="fas fa-triangle-exclamation me-1"></i> '+esc(d.reason||'Gateway Error'); }
+  }catch{ b.className='badge bg-danger px-3 py-2'; b.innerHTML='<i class="fas fa-plug-circle-xmark me-1"></i> Offline'; }
+}
+
+/* ---------- Send ---------- */
+async function handleSend(e){
+  e.preventDefault();
+  const a = parseAction($('actionInput').value);
+  const diag = $('diag'), btn = $('submitBtn');
+  const show = (cls, head, msg, why) => {
+    diag.className = 'diag ' + cls; $('dHead').innerHTML = head; $('dMsg').innerHTML = msg; $('dWhy').textContent = why || '';
+    $('dTime').textContent = new Date().toLocaleTimeString();
+  };
+  if(a.type==='none'){ show('e','<i class="fas fa-times-circle"></i> रुका','क्लिक एक्शन खाली है','कोई फ़ाइल का नाम (dono.html) या लिंक लिखें।'); return; }
+  if(a.type==='invalid'){ show('e','<i class="fas fa-times-circle"></i> रुका','लिंक सही नहीं है', a.label); return; }
+  const topic = topicValue();
+  if(!topic){ show('e','<i class="fas fa-times-circle"></i> रुका','Topic खाली है','कस्टम topic का नाम लिखें।'); return; }
+  if($('topicSel').value==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण (all) को जाएगा। भेजें?')) return;
+
+  const payload = {
+    title: $('pushTitle').value.trim(), body: $('pushBody').value.trim(), imageUrl: $('pushImage').value.trim(),
+    actionUrl: a.url, actionType: a.type, openIn: resolveOpenIn(a.type),
+    topic, isLoudAlert: $('loudSwitch').checked, priority: $('priority').value
+  };
+
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेजा जा रहा है…';
+  diag.classList.remove('d-none'); show('', 'SENDING…', 'अनुरोध प्रोसेस हो रहा है…');
+  try{
+    const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify(payload)});
+    const d = await r.json().catch(()=>({}));
+    if(r.ok && d.success){
+      show('s','<i class="fas fa-check-circle text-success"></i> SUCCESS', `भेज दिया गया!<br><small style="color:#A7F3D0">${esc(d.targetLink||a.url)} • ${d.isLoud?'🚨 LOUD':'सामान्य'} • ${esc(payload.openIn)}</small>`, `Topic "${d.targetTopic||topic}" पर डिलीवर।${d.messageId?' ID: '+d.messageId:''}`);
+      addHist(payload, 'Success');
+    } else {
+      const hint = r.status===401 ? 'ऊपर "Admin Key" में सही key डालें।' : (d.details || 'कोई विवरण नहीं।');
+      show('e','<i class="fas fa-times-circle text-danger"></i> FAILED', `कारण: <b>${esc(d.reason || 'त्रुटि '+r.status)}</b>`, hint);
+      addHist(payload, 'Failed');
+    }
+  }catch(err){
+    show('e','<i class="fas fa-triangle-exclamation text-danger"></i> GATEWAY ERROR','/api/send-push से कनेक्ट नहीं हो सका।', err.message);
+    addHist(payload, 'Gateway Error');
+  }finally{
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें';
+  }
+}
+
+/* ---------- History ---------- */
+function addHist(p, status){
+  const h = store.get('fcm_push_history', []);
+  h.unshift({p, status, time: new Date().toLocaleString('hi-IN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})});
+  store.set('fcm_push_history', h.slice(0,15)); renderHist();
+}
+function renderHist(){
+  const h = store.get('fcm_push_history', []);
+  $('hist').innerHTML = h.length ? h.map((x,i) => `
+    <div class="hrow" onclick="reuse(${i})">
+      <div style="min-width:0">
+        <div class="fw-bold text-truncate">${esc(x.p.title)}</div>
+        <small style="color:${x.status==='Success'?'#34D399':'#F87171'};font-weight:700">${esc(x.status)}</small>
+        <small class="text-muted text-break"> • ${esc(x.p.actionUrl)}</small>
+      </div>
+      <div class="text-muted text-end" style="font-size:.7rem;white-space:nowrap">${esc(x.time)}<br>${esc(x.p.topic)}</div>
+    </div>`).join('') : '<div class="text-center text-muted small py-3">कोई हालिया लॉग नहीं है।</div>';
+}
+function reuse(i){
+  const x = store.get('fcm_push_history', [])[i]; if(!x) return;
+  $('pushTitle').value = x.p.title; $('pushBody').value = x.p.body; $('pushImage').value = x.p.imageUrl || '';
+  $('loudSwitch').checked = !!x.p.isLoudAlert; $('priority').value = x.p.priority || 'high';
+  const known = ['all','darshan','test'];
+  if(known.includes(x.p.topic)) $('topicSel').value = x.p.topic; else { $('topicSel').value='__custom'; $('topicCustom').value = x.p.topic; }
+  onTopic(); setAction(x.p.actionUrl); window.scrollTo({top:0,behavior:'smooth'});
+}
+function clearHist(){ localStorage.removeItem('fcm_push_history'); renderHist(); }
+
+document.addEventListener('DOMContentLoaded', () => { renderChips(); renderHist(); upd(); checkGateway(); });
+</script>
+</body>
+</html>
