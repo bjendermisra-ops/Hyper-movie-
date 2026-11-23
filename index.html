@@ -275,6 +275,17 @@
                 </div>
 
                 <form id="pushForm" onsubmit="handleSendPush(event)">
+    <div class="mb-3">
+      <label for="targetApp">किस ऐप पर भेजें?</label>
+      <select id="targetApp" class="custom-select" required>
+        <option value="" selected disabled>ऐप चुनें</option>
+        <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
+        <option value="hadapsar">ISKCON Hadapsar (नया ऐप)</option>
+      </select>
+    </div>
+    <label for="senderKey">Admin key</label>
+    <input id="senderKey" class="form-control mb-3" type="password" autocomplete="current-password" required>
+
                     
                     <div class="row g-2">
                         <div class="col-12 col-md-6">
@@ -419,8 +430,8 @@
         try {
             const response = await fetch('/api/send-push', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, body, imageUrl, actionUrl, topic })
+                headers: { 'Content-Type': 'application/json', 'x-admin-key': document.getElementById('senderKey').value },
+                body: JSON.stringify({ app: document.getElementById("targetApp").value, title, body, imageUrl, actionUrl, topic })
             });
 
             const data = await response.json();
@@ -430,20 +441,17 @@
             if (response.ok && data.success) {
                 // ✅ सफलता
                 diagConsole.classList.add('diag-success');
-                diagStatusHead.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> SUCCESS (डिलीवर हो गया)`;
-                diagMessage.innerHTML = `सफलतापूर्वक भेजा गया! <br><small style="color:#A7F3D0;">FCM Message ID: ${data.messageId}</small>`;
-                diagReason.innerText = `Topic: "${data.targetTopic}" के सभी सब्सक्राइबर्स को भेजा जा चुका है।`;
+                diagStatusHead.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> FCM ACCEPTED`;
+                diagMessage.innerText = `FCM accepted · ${data.projectId}   FCM Message ID: ${data.messageId}`;
+                diagReason.innerText = `Topic: ${data.targetTopic}`;
 
                 saveToHistory({ title, body, status: 'Success', time: new Date().toLocaleTimeString() });
             } else {
                 // ❌ असफलता (Failure Diagnosis)
                 diagConsole.classList.add('diag-error');
                 diagStatusHead.innerHTML = `<i class="fas fa-times-circle text-danger me-1"></i> FAILED (नोटिफिकेशन नहीं गया)`;
-                diagMessage.innerHTML = `कारण: <b>${data.reason || "त्रुटि"}</b>`;
-                diagReason.innerHTML = `
-                    <b>विस्तार:</b> ${data.details || "कोई विवरण उपलब्ध नहीं।"}<br>
-                    ${data.diagnosis ? `<b>सुझाव / फिक्स:</b> ${data.diagnosis}` : ''}
-                `;
+                diagMessage.innerText = `कारण: ${data.reason || "त्रुटि"}`;
+                diagReason.innerText = data.details || '';
 
                 saveToHistory({ title, body, status: 'Failed: ' + (data.reason || 'Error'), time: new Date().toLocaleTimeString() });
             }
@@ -474,6 +482,10 @@
         renderHistory();
     }
 
+    function escapeHistory(value) {
+        return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    }
+
     function renderHistory() {
         const body = document.getElementById('historyBody');
         let history = JSON.parse(localStorage.getItem('fcm_push_history') || '[]');
@@ -485,12 +497,12 @@
         body.innerHTML = history.map(h => `
             <tr>
                 <td>
-                    <div class="fw-bold text-white text-truncate" style="max-width: 170px;">${h.title}</div>
+                    <div class="fw-bold text-white text-truncate" style="max-width: 170px;">${escapeHistory(h.title)}</div>
                     <small style="color: ${h.status.startsWith('Success') ? '#34D399' : '#F87171'}; font-weight: 700;">
-                        ${h.status}
+                        ${escapeHistory(h.status)}
                     </small>
                 </td>
-                <td class="text-end text-muted font-monospace" style="font-size: 0.72rem;">${h.time}</td>
+                <td class="text-end text-muted font-monospace" style="font-size: 0.72rem;">${escapeHistory(h.time)}</td>
             </tr>
         `).join('');
     }

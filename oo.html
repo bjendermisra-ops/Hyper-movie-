@@ -124,6 +124,14 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
 
 <div class="grid">
 <form class="panel" id="form" onsubmit="send(event)">
+    <div class="mb-3">
+      <label for="targetApp">किस ऐप पर भेजें?</label>
+      <select id="targetApp" class="f" required>
+        <option value="" selected disabled>ऐप चुनें</option>
+        <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
+        <option value="hadapsar">ISKCON Hadapsar (नया ऐप)</option>
+      </select>
+    </div>
 
   <div class="sec">
     <h2><i class="fas fa-users"></i> किसे भेजना है</h2>
@@ -450,7 +458,7 @@ async function send(e){
   if(!topic) return showDiag('e','Topic का नाम खाली है।');
   if(topic==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण को जाएगा। भेजें?')) return;
 
-  const payload = { title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
+  const payload = { app:el('targetApp').value, title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
     actionUrl:a.url, actionType:a.type, openIn:openMode(a.type), topic, isLoudAlert:el('loud').checked, priority:el('priority').value };
   const btn = el('sendBtn'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं…';
   showDiag('', 'FCM को भेजा जा रहा है…');
@@ -458,7 +466,7 @@ async function send(e){
     const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify(payload)});
     const d = await r.json().catch(() => ({}));
     if(r.ok && d.success){
-      showDiag('s', `✔ भेज दिया गया<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
+      showDiag('s', `✔ FCM accepted · ${esc(d.projectId)}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
       addHist(payload,'Success');
     }else{
       showDiag('e', `✖ नहीं गया<br>कारण: ${esc(d.reason||('त्रुटि '+r.status))}<br>${esc(d.details||'')}`);
