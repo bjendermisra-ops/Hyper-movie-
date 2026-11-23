@@ -125,7 +125,11 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
 <div class="grid">
 <form class="panel" id="form" onsubmit="send(event)">
     <div class="mb-3">
-      <label for="targetApp">किस ऐप पर भेजें?</label>
+      <details><summary>एक फोन पर टेस्ट करें</summary>
+ <label for="testDevice">इस ऐप का FCM registration token</label>
+ <input id="testDevice" type="password" autocomplete="off" placeholder="Test phone token">
+ <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p></details>
+ <label for="targetApp">किस ऐप पर भेजें?</label>
       <select id="targetApp" class="f" required>
         <option value="" selected disabled>ऐप चुनें</option>
         <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
@@ -456,18 +460,19 @@ async function send(e){
   if(a.type==='invalid') return showDiag('e','लिंक सही नहीं है: ' + esc(a.label));
   const topic = topicVal();
   if(!topic) return showDiag('e','Topic का नाम खाली है।');
-  if(topic==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण को जाएगा। भेजें?')) return;
+  if(!testToken() && topic==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण को जाएगा। भेजें?')) return;
 
   const payload = { app:el('targetApp').value, title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
     actionUrl:a.url, actionType:a.type, openIn:openMode(a.type), topic, isLoudAlert:el('loud').checked, priority:el('priority').value };
   const btn = el('sendBtn'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं…';
   showDiag('', 'FCM को भेजा जा रहा है…');
   try{
-    const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify(payload)});
+    const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify({...payload, deviceToken:testToken()})});
     const d = await r.json().catch(() => ({}));
     if(r.ok && d.success){
-      showDiag('s', `✔ FCM accepted · ${esc(d.projectId)}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
-      addHist(payload,'Success');
+      showDiag('', `FCM स्वीकार · फोन पर डिलीवरी अपुष्ट · ${esc(d.projectId)}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
+      addHist(payload,'Delivery unconfirmed');
+      offerReceipt(el('diag'), d, () => { showDiag('s','टेस्ट फोन पर डिलीवरी की पुष्टि हुई'); addHist(payload,'Test phone confirmed'); });
     }else{
       showDiag('e', `✖ नहीं गया<br>कारण: ${esc(d.reason||('त्रुटि '+r.status))}<br>${esc(d.details||'')}`);
       addHist(payload,'Failed');
@@ -486,7 +491,7 @@ function renderHist(){
   const h = store.get('fcm_push_history', []);
   el('hist').innerHTML = h.length ? h.map((x,i) => {
     const p = x.p || {title:x.title, actionUrl:x.link, topic:''};
-    return `<div class="hrow" data-h="${i}"><div style="min-width:0"><b>${esc(p.title)}</b><small class="${x.status==='Success'?'okc':'badc'}">${esc(x.status)}</small> <small>· ${esc(p.actionUrl||'')}</small></div><div class="r">${esc(x.time)}<br>${esc(p.topic||'')}</div></div>`;
+    return `<div class="hrow" data-h="${i}"><div style="min-width:0"><b>${esc(p.title)}</b><small class="${x.status==='Test phone confirmed'?'okc':''}">${esc(x.status==='Success'?'FCM accepted (unconfirmed)':x.status)}</small> <small>· ${esc(p.actionUrl||'')}</small></div><div class="r">${esc(x.time)}<br>${esc(p.topic||'')}</div></div>`;
   }).join('') : '<div class="empty">अभी कोई ब्रॉडकास्ट नहीं भेजा गया।</div>';
 }
 el('hist').addEventListener('click', e => {
@@ -501,5 +506,6 @@ function clearHist(){ localStorage.removeItem('fcm_push_history'); renderHist();
 document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeLib(); closeKey(); } });
 renderLib(); renderTpl(); renderHist(); upd(); tick(); setInterval(tick, 30000); checkGateway();
 </script>
+<script src="/delivery-test.js"></script>
 </body>
 </html>

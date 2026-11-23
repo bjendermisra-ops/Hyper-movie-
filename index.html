@@ -276,7 +276,11 @@
 
                 <form id="pushForm" onsubmit="handleSendPush(event)">
     <div class="mb-3">
-      <label for="targetApp">किस ऐप पर भेजें?</label>
+      <details><summary>एक फोन पर टेस्ट करें</summary>
+ <label for="testDevice">इस ऐप का FCM registration token</label>
+ <input id="testDevice" type="password" autocomplete="off" placeholder="Test phone token">
+ <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p></details>
+ <label for="targetApp">किस ऐप पर भेजें?</label>
       <select id="targetApp" class="custom-select" required>
         <option value="" selected disabled>ऐप चुनें</option>
         <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
@@ -431,7 +435,7 @@
             const response = await fetch('/api/send-push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-admin-key': document.getElementById('senderKey').value },
-                body: JSON.stringify({ app: document.getElementById("targetApp").value, title, body, imageUrl, actionUrl, topic })
+                body: JSON.stringify({ deviceToken: testToken(), app: document.getElementById("targetApp").value, title, body, imageUrl, actionUrl, topic })
             });
 
             const data = await response.json();
@@ -440,12 +444,17 @@
 
             if (response.ok && data.success) {
                 // ✅ सफलता
-                diagConsole.classList.add('diag-success');
-                diagStatusHead.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> FCM ACCEPTED`;
+                diagConsole.classList.remove('diag-success');
+                diagStatusHead.innerHTML = `FCM ने स्वीकार किया · डिलीवरी अपुष्ट`;
                 diagMessage.innerText = `FCM accepted · ${data.projectId}   FCM Message ID: ${data.messageId}`;
-                diagReason.innerText = `Topic: ${data.targetTopic}`;
+                diagReason.innerText = `लक्ष्य: ${data.targetTopic} · फोन से पुष्टि नहीं मिली है।`;
 
-                saveToHistory({ title, body, status: 'Success', time: new Date().toLocaleTimeString() });
+                saveToHistory({ title, body, status: 'Delivery unconfirmed', time: new Date().toLocaleTimeString() });
+                offerReceipt(diagReason, data, () => {
+                    diagStatusHead.textContent = 'टेस्ट फोन पर डिलीवरी की पुष्टि हुई';
+                    saveToHistory({ title, link: actionUrl, status: 'Test phone confirmed', time: new Date().toLocaleTimeString() });
+                });
+
             } else {
                 // ❌ असफलता (Failure Diagnosis)
                 diagConsole.classList.add('diag-error');
@@ -498,8 +507,8 @@
             <tr>
                 <td>
                     <div class="fw-bold text-white text-truncate" style="max-width: 170px;">${escapeHistory(h.title)}</div>
-                    <small style="color: ${h.status.startsWith('Success') ? '#34D399' : '#F87171'}; font-weight: 700;">
-                        ${escapeHistory(h.status)}
+                    <small style="color: ${h.status === 'Test phone confirmed' ? '#34D399' : '#d3bfaf'}; font-weight: 700;">
+                        ${escapeHistory(h.status === 'Success' ? 'FCM accepted (unconfirmed)' : h.status)}
                     </small>
                 </td>
                 <td class="text-end text-muted font-monospace" style="font-size: 0.72rem;">${escapeHistory(h.time)}</td>
@@ -516,5 +525,6 @@
         renderHistory();
     });
 </script>
+<script src="/delivery-test.js"></script>
 </body>
 </html>

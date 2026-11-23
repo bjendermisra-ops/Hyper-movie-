@@ -69,9 +69,16 @@ module.exports = async function handler(req, res) {
 
   const { title, body, imageUrl, actionUrl, topic, isLoudAlert } = req.body || {};
 
-  if (!title || !title.trim()) return res.status(400).json({ success: false, reason: "Missing Title" });
-  if (!body || !body.trim()) return res.status(400).json({ success: false, reason: "Missing Body" });
+  if (typeof title !== "string" || !title.trim()) return res.status(400).json({ success: false, reason: "Missing Title" });
+  if (typeof body !== "string" || !body.trim()) return res.status(400).json({ success: false, reason: "Missing Body" });
 
+  const deviceToken = req.body.deviceToken;
+  if (deviceToken !== undefined && (typeof deviceToken !== 'string' ||
+      !deviceToken.trim() || /\s/.test(deviceToken) || deviceToken.length > 4096)) {
+    return res.status(400).json({ success: false, reason: 'Invalid test device token' });
+  }
+  const receipt = deviceToken ? crypto.randomBytes(6).toString('hex').toUpperCase() : null;
+  const messageBody = receipt ? body.trim() + '\nTest code: ' + receipt : body.trim();
   const targetTopic = (!topic || topic === 'all' || topic === 'temple_all') ? 'temple_all' : topic;
   const safeImg = (imageUrl && imageUrl.trim().startsWith('http')) ? imageUrl.trim() : "";
   const safeAction = (actionUrl && actionUrl.trim()) ? actionUrl.trim() : "home.html";
@@ -94,11 +101,11 @@ module.exports = async function handler(req, res) {
     // 🔥 100% CRASH-PROOF DATA PAYLOAD + अलार्म व एक्सटर्नल लिंक सपोर्ट
     const fcmPayload = {
       message: {
-        topic: targetTopic,
+        ...(deviceToken ? { token: deviceToken } : { topic: targetTopic }),
         data: {
           title: title.trim(),
-          body: body.trim(),
-          message: body.trim(),
+          body: messageBody,
+          message: messageBody,
           image: safeImg,
           imageUrl: safeImg,
           img: safeImg,
@@ -115,7 +122,7 @@ module.exports = async function handler(req, res) {
           channel_id: isLoudAlert ? "alarm_high_channel" : "general_channel"
         },
         android: {
-          ...(req.body.app === "hadapsar" ? { restricted_package_name: "com.iskcon.hadapsar.santosh.in" } : {}),
+          ...(req.body.app === "hadapsar" ? { restricted_package_name: "bhagwat.gita.hindi.and.marathi.dev.santosh" } : {}),
           priority: "HIGH"
         }
       }
@@ -134,16 +141,19 @@ module.exports = async function handler(req, res) {
     if (!fcmRes.ok) {
       return res.status(fcmRes.status).json({
         success: false,
-        reason: fcmData.error?.status || "FCM_API_ERROR",
+        reason: fcmData.error?.details?.find(item => item.errorCode)?.errorCode || fcmData.error?.status || "FCM_API_ERROR",
         details: fcmData.error?.message || "Google FCM Rejected Message"
       });
     }
 
+    if (!fcmData.name) return res.status(502).json({ success: false, reason: 'Firebase returned no message ID' });
     return res.status(200).json({
+      deliveryStatus: 'unconfirmed',
+      receiptHash: receipt ? crypto.createHash('sha256').update(receipt).digest('hex') : null,
       success: true,
       messageId: fcmData.name,
       projectId: project.id,
-      targetTopic: targetTopic,
+      targetTopic: deviceToken ? 'Test phone' : targetTopic,
       targetLink: safeAction,
       isLoud: !!isLoudAlert,
       timestamp: new Date().toISOString()
