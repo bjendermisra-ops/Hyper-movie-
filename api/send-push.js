@@ -1,37 +1,10 @@
 // api/send-push.js (Zero-Dependency Node.js FCM v1 Gateway)
 const crypto = require('crypto');
 
-const PROJECT_ID = "radha-krishna-chandra";
-const CLIENT_EMAIL = "firebase-adminsdk-fbsvc@radha-krishna-chandra.iam.gserviceaccount.com";
-
-const PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDSEGaufyvrNXMz
-ZDCkqzStfkDLjBd1UI7iNBxvYDybk/2WioQ4PZ0gMZnnnRGbn8JUkuQOlPrF86gr
-+uf7zdz5DdiAX0zYtdjiGB3/HqOWE+7/18zEKtFsNrRkiVArHgaK38ZY/piTT4JX
-h9syq5gLz+ZxotRbzfrI9VzjpoYlb72K0BKlTOLoipj2ikBWmvji0h0WE9q1mm5M
-HE4L22aqi7vE5Kz7jOENoJSXG/jLq8DjwAxFqfcmpZF5M6eO8Jlg5Mjpduz7EtpQ
-WY1lCqWG28gWuQag1SB7MYoZt1tkclElDeo2/qxES2Ap1qm+RhwHwcUFM3wcqcA+
-1wMHNh3LAgMBAAECggEABqY7QdnHr53VBDLvMT80HyvIbEkGcxG2PCXPIp1mvbv9
-AndnAQq+Pwci6oh3xrfTZG7z5hxEJeD1GVNLZZaaII4WJNYfbhqvf1SpGmrDXdxK
-q/GOS0VZtLW0lxwbnAnKxjmYIzgH513Ub+Xeg+eXnAQcNMulMjS+c/8ETjZ2t5eX
-tcb5m9XXEKX9UeUDHE7mmf5HYGHE9QZ4f4f/icw1zhWpT5e7/6p9BBP+a70Qoq2n
-fI4QHcQKv08shYCd2IHCowiLVjiT14J8D61NUG+6uZlhcmH4rahCnxOjfKoDg1Q5
-FKfEpbvRiEge9RFLP9HJUZABfRss+M53iBgOWGYa0QKBgQDvBVBw1WmoNI82eyzD
-5t1CUBC7QtUdEVjsYfVK5BSeKZN4G9GwRxFdrzYgcClHd3UkaCoUDeB9zHQVjZEt
-9G+eO0M73oWOVyWwSmMed0pvpIRad5GQqZYDotzh5F4j1ZROTsneLdN4xcfKQ+aQ
-1G8i/eS4q2tZljnD7gRFx3R02wKBgQDg/H+F0qumAOrKdqKHkKBqghxYrGqxNAeR
-F8/hjZ19/loDNm1OmGjrJIncJwLvjkztSTsvdkVuU3pAS4B/BJ4WItUGr4L6TYD+
-EmGr++AHUhHyTzLuBXILN++kxwajbpFzVYNgkRoD6O4tKtPcTvbbAiwktYME+ObH
-/DgvJ+JV0QKBgQCkVdAHtANv3as1dxzBGEK57BiE15902896vqMKuaQfVlCI/P9/
-pm0fL28UgGkxNMW6oU+E+EGH3IFXrDzMDsqLTQ2d5RGIWwyTl6FsefIYrlE9bgYM
-Izz8BQa+3OeI1big2nTaqEFEQR9rRqIIo7ZBpbSS73DgaHQQ7N3NKCQ+jwKBgBU+
-Qhw0pBhshb7QLNB4C22DE4Ib5YcNzpkYknxNjs1SstUS0odVRLLPJGUxGcncuc69
-12TH2g5su2JOvrc/jF2ytEKJV+iiYMecnLRMd/649RDYAYsP4JDGm04HrMzJp9on
-/NulV7t+xt5k6NQocI6FSf29Vb2mcsP3QKbTMT/BAoGAKS1m9O9apCH8OGoOTDAz
-cbfuFkJ4yBVxt1Vnx/YV/vvS5o6Ql6fyOWWNVU6VvfFS5Jzd7ZsKqj/yFfhzlHZk
-p8hPzFj2HNPqAkfwfiovW+RBU0+kv+J/Qki/rU5FGjrwWoiCleJOCQx3KO3PtXZv
-cZt3B8KUOXx9IRKiJ9c4CYo=
------END PRIVATE KEY-----`;
+const projects = new Map([
+  ['original', { id: 'radha-krishna-chandra', secret: 'FIREBASE_SERVICE_ACCOUNT' }],
+  ['hadapsar', { id: 'iskcon-hadapsar-645be', secret: 'HADAPSAR_SERVICE_ACCOUNT' }]
+]);
 
 function base64url(input) {
   return Buffer.from(input)
@@ -41,11 +14,11 @@ function base64url(input) {
     .replace(/\//g, '_');
 }
 
-async function getGoogleAccessToken() {
+async function getGoogleAccessToken(account) {
   const now = Math.floor(Date.now() / 1000);
   const header = { alg: 'RS256', typ: 'JWT' };
   const claim = {
-    iss: CLIENT_EMAIL,
+    iss: account.client_email,
     scope: 'https://www.googleapis.com/auth/firebase.messaging',
     aud: 'https://oauth2.googleapis.com/token',
     exp: now + 3600,
@@ -58,7 +31,7 @@ async function getGoogleAccessToken() {
 
   const signer = crypto.createSign('RSA-SHA256');
   signer.update(signInput);
-  const signatureB64 = signer.sign(PRIVATE_KEY, 'base64')
+  const signatureB64 = signer.sign(account.private_key, 'base64')
     .replace(/=/g, '')
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
@@ -82,12 +55,17 @@ async function getGoogleAccessToken() {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ success: false, reason: "Method Not Allowed" });
+
+  const suppliedKey = req.headers['x-admin-key'];
+  const digest = value => crypto.createHash('sha256').update(value).digest();
+  if (!process.env.ADMIN_KEY || typeof suppliedKey !== 'string' ||
+      !crypto.timingSafeEqual(digest(suppliedKey), digest(process.env.ADMIN_KEY))) {
+    return res.status(401).json({ success: false, reason: 'Valid admin key required' });
+  }
+  const project = projects.get(req.body?.app);
+  if (!project) return res.status(400).json({ success: false, reason: 'Select a target app' });
 
   const { title, body, imageUrl, actionUrl, topic, isLoudAlert } = req.body || {};
 
@@ -102,7 +80,16 @@ module.exports = async function handler(req, res) {
   const isExternalUrl = /^https?:\/\//i.test(safeAction);
 
   try {
-    const accessToken = await getGoogleAccessToken();
+    let account;
+    try {
+      account = JSON.parse(process.env[project.secret] || 'null');
+    } catch {
+      account = null;
+    }
+    if (account?.project_id !== project.id || !account.client_email || !account.private_key) {
+      return res.status(503).json({ success: false, reason: 'Check server setting ' + project.secret });
+    }
+    const accessToken = await getGoogleAccessToken(account);
 
     // 🔥 100% CRASH-PROOF DATA PAYLOAD + अलार्म व एक्सटर्नल लिंक सपोर्ट
     const fcmPayload = {
@@ -128,12 +115,13 @@ module.exports = async function handler(req, res) {
           channel_id: isLoudAlert ? "alarm_high_channel" : "general_channel"
         },
         android: {
+          ...(req.body.app === "hadapsar" ? { restricted_package_name: "com.iskcon.hadapsar.santosh.in" } : {}),
           priority: "HIGH"
         }
       }
     };
 
-    const fcmRes = await fetch(`https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send`, {
+    const fcmRes = await fetch(`https://fcm.googleapis.com/v1/projects/${project.id}/messages:send`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -154,6 +142,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       success: true,
       messageId: fcmData.name,
+      projectId: project.id,
       targetTopic: targetTopic,
       targetLink: safeAction,
       isLoud: !!isLoudAlert,
