@@ -1,0 +1,19 @@
+:root {color-scheme:dark;--dark-bg:#111b19;--dark-card:#192622;--border-dark:#3a4b42;--text-muted:#bcc8bf;--primary:#ffc283}
+body {background:#111b19;color:#f6f1e6;font-family:system-ui,sans-serif}
+.header-bar,.app-container,.wrap {max-width:1040px;margin-inline:auto}
+.header-bar {background:linear-gradient(115deg,#203c31,#192923);border-left:4px solid #ecac70;border-radius:0 18px 18px 0;padding:22px clamp(16px,4vw,40px);margin-bottom:18px}
+.header-bar h1,.top h1 {font:600 clamp(1.65rem,4vw,2.5rem)/1.2 Georgia,serif;letter-spacing:-.025em;color:#fff4df;margin:0}
+.header-bar p {margin:.4rem 0 0;color:#c9d5ca}
+.custom-card,.panel {background:#192622;border:1px solid #394d40;box-shadow:none}
+.card-header-custom,.sec h2 {color:#fff3dc}
+.custom-input,.custom-select,.custom-textarea,#senderKey,#testDevice,.f {background:#101b17;color:#f9f3e9;border:1px solid #536459;border-radius:10px;min-height:46px;padding:10px 12px;max-width:100%}
+#senderKey,#testDevice {width:100%}
+input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,button:focus-visible {outline:2px solid #ffbf80;outline-offset:2px}
+details {padding:10px 12px;border:1px solid #45584b;border-radius:10px;margin:.6rem 0}
+details summary {cursor:pointer;color:#f5d3ac}
+details[open] summary {margin-bottom:10px}
+.form-label,label {text-transform:none;letter-spacing:0;color:#cbd7cb}
+.send-btn {background:#f2b275;color:#25190d;box-shadow:none}
+#diagConsole,#diag {overflow-wrap:anywhere}
+#diagConsole:not(.diag-error) #diagReason {color:#bfd0c2!important}
+@media(max-width:600px){body{padding:14px 12px 40px}.custom-card{padding:16px;border-radius:15px}.header-bar{padding:16px}input,textarea,select{font-size:16px!important}.app-container [class*=col-]{min-width:0}}

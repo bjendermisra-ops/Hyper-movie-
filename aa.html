@@ -2,8 +2,8 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Notification Command Center - Sri Sri Radha Krishna Chandra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ISKCON Hadapsar · सूचना केंद्र</title>
     
     <!-- Fonts & Bootstrap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -270,25 +270,11 @@
         .history-table td:first-child { border-left: 1px solid var(--border-dark); border-radius: 10px 0 0 10px; }
         .history-table td:last-child { border-right: 1px solid var(--border-dark); border-radius: 0 10px 10px 0; }
     </style>
+<link rel="stylesheet" href="/mandir.css">
 </head>
 <body>
 
-<div class="header-bar">
-    <div>
-        <h1 class="brand-title">
-            <i class="fas fa-gopuram"></i> RADHA KRISHNA CHANDRA
-        </h1>
-        <small style="color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">
-            FCM PUSH NOTIFICATION & MULTI-LINK COMMAND CENTER
-        </small>
-    </div>
-    <div>
-        <span class="badge bg-success bg-opacity-20 text-success border border-success px-3 py-2 fw-bold">
-            <i class="fas fa-wifi me-1"></i> FCM Gateway: Active
-        </span>
-    </div>
-</div>
-
+<header class="header-bar"><div><h1>ISKCON Hadapsar</h1><p>मंदिर सूचना केंद्र</p></div></header>
 <div class="app-container">
     <div class="row g-4">
         
@@ -296,7 +282,7 @@
         <div class="col-12 col-lg-7">
             <div class="custom-card">
                 <div class="card-header-custom">
-                    <i class="fas fa-paper-plane text-warning"></i> नोटिफिकेशन भेजें (Send Broadcast)
+                    <i class="fas fa-paper-plane text-warning"></i> नई सूचना लिखें
                 </div>
 
                 <form id="pushForm" onsubmit="handleSendPush(event)">
@@ -305,14 +291,9 @@
  <label for="testDevice">इस ऐप का FCM registration token</label>
  <input id="testDevice" type="password" autocomplete="off" placeholder="Test phone token">
  <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p></details>
- <label for="targetApp">किस ऐप पर भेजें?</label>
-      <select id="targetApp" class="custom-select" required>
-        <option value="" selected disabled>ऐप चुनें</option>
-        <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
-        <option value="hadapsar">ISKCON Hadapsar (नया ऐप)</option>
-      </select>
+ 
     </div>
-    <label for="senderKey">Admin key</label>
+    <label for="senderKey">एडमिन पासवर्ड</label>
     <input id="senderKey" class="form-control mb-3" type="password" autocomplete="current-password" required>
 
                     
@@ -394,12 +375,12 @@
             </div>
         </div>
 
-        <!-- 📱 लाइव मोबाइल प्रीव्यू -->
+        <!-- 📱 फोन पर कैसा दिखेगा -->
         <div class="col-12 col-lg-5">
             <div class="custom-card">
                 <div class="card-header-custom justify-content-between">
-                    <span><i class="fas fa-mobile-screen text-warning"></i> लाइव मोबाइल प्रीव्यू</span>
-                    <small style="font-size: 0.72rem; color: var(--text-muted);">Real-time View</small>
+                    <span><i class="fas fa-mobile-screen text-warning"></i> फोन पर कैसा दिखेगा</span>
+                    <small style="font-size: 0.72rem; color: var(--text-muted);"></small>
                 </div>
 
                 <div class="preview-box">
@@ -408,7 +389,7 @@
                     <div class="mock-notification">
                         <div class="mock-header">
                             <div class="mock-badge"><i class="fas fa-bell"></i></div>
-                            <span>श्री श्री राधाकृष्ण चंद्र</span>
+                            <span>ISKCON Hadapsar</span>
                             <span style="opacity: 0.5;">• अभी</span>
                             <span id="prevAlarmIcon" class="ms-auto text-danger d-none"><i class="fas fa-volume-high"></i> LOUD</span>
                         </div>
@@ -526,7 +507,7 @@
             const response = await fetch('/api/send-push', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-admin-key': document.getElementById('senderKey').value },
-                body: JSON.stringify({ deviceToken: testToken(), app: document.getElementById("targetApp").value, title, body, imageUrl, actionUrl, topic, isLoudAlert })
+                body: JSON.stringify({ deviceToken: testToken(), app: 'hadapsar', title, body, imageUrl, actionUrl, topic, isLoudAlert })
             });
 
             const data = await response.json();
@@ -534,11 +515,11 @@
 
             if (response.ok && data.success) {
                 diagConsole.classList.remove('diag-success');
-                diagStatusHead.innerHTML = `FCM ने स्वीकार किया · डिलीवरी अपुष्ट`;
-                diagMessage.innerText = `FCM accepted · ${data.projectId}   लिंक: ${data.targetLink} | मोड: ${data.isLoud ? '🚨 SUPER LOUD' : 'सामान्य'}`;
-                diagReason.innerText = `लक्ष्य: ${data.targetTopic} · फोन से पुष्टि नहीं मिली है।`;
+                diagStatusHead.innerHTML = `Firebase ने संदेश स्वीकार किया`;
+                diagMessage.innerText = data.receiptHash ? 'टेस्ट फोन पर आया कोड नीचे डालें।' : 'प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।';
+                diagReason.innerText = `लक्ष्य: ${data.targetTopic}`;
 
-                saveToHistory({ title, link: data.targetLink, status: 'Delivery unconfirmed', time: new Date().toLocaleTimeString() });
+                saveToHistory({ title, link: data.targetLink, status: 'Firebase ने स्वीकार किया', time: new Date().toLocaleTimeString() });
                 offerReceipt(diagReason, data, () => {
                     diagStatusHead.textContent = 'टेस्ट फोन पर डिलीवरी की पुष्टि हुई';
                     saveToHistory({ title, link: actionUrl, status: 'Test phone confirmed', time: new Date().toLocaleTimeString() });
@@ -591,7 +572,7 @@
                 <td>
                     <div class="fw-bold text-white text-truncate" style="max-width: 170px;">${escapeHistory(h.title)}</div>
                     <small style="color: ${h.status === 'Test phone confirmed' ? '#34D399' : '#d3bfaf'}; font-weight: 700;">
-                        ${escapeHistory(h.status === 'Success' ? 'FCM accepted (unconfirmed)' : h.status)} • <span class="text-muted">${escapeHistory(h.link)}</span>
+                        ${escapeHistory(h.status === 'Success' ? 'Firebase ने स्वीकार किया' : h.status)} • <span class="text-muted">${escapeHistory(h.link)}</span>
                     </small>
                 </td>
                 <td class="text-end text-muted font-monospace" style="font-size: 0.72rem;">${escapeHistory(h.time)}</td>

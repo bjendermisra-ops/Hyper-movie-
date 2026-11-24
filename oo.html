@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>सूचना केंद्र · श्री श्री राधा कृष्ण चंद्र</title>
+<title>ISKCON Hadapsar · सूचना केंद्र</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -106,6 +106,7 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
 :focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<link rel="stylesheet" href="/mandir.css">
 </head>
 <body>
 <div class="wrap">
@@ -113,7 +114,7 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
 <header class="top">
   <div class="brand">
     <div class="mark"><i class="fas fa-om"></i></div>
-    <div><h1>राधा कृष्ण चंद्र</h1><p>पुश नोटिफिकेशन सूचना केंद्र</p></div>
+    <div><h1>ISKCON Hadapsar</h1><p>पुश नोटिफिकेशन सूचना केंद्र</p></div>
   </div>
   <div class="tools">
     <span class="status" id="gw"><i class="dot"></i><span>जाँच रहे हैं…</span></span>
@@ -129,17 +130,12 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
  <label for="testDevice">इस ऐप का FCM registration token</label>
  <input id="testDevice" type="password" autocomplete="off" placeholder="Test phone token">
  <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p></details>
- <label for="targetApp">किस ऐप पर भेजें?</label>
-      <select id="targetApp" class="f" required>
-        <option value="" selected disabled>ऐप चुनें</option>
-        <option value="original">Radha Krishna Chandra (पुराना ऐप)</option>
-        <option value="hadapsar">ISKCON Hadapsar (नया ऐप)</option>
-      </select>
+ 
     </div>
 
   <div class="sec">
     <h2><i class="fas fa-users"></i> किसे भेजना है</h2>
-    <p class="sub">Topic चुनें। पहले "test" पर जाँच लें, फिर सबको भेजें।</p>
+    <p class="sub">एक फोन पर जाँच के लिए उसका टोकन भरें।</p>
     <div class="two">
       <div>
         <label class="l">ऑडियंस</label>
@@ -462,7 +458,7 @@ async function send(e){
   if(!topic) return showDiag('e','Topic का नाम खाली है।');
   if(!testToken() && topic==='all' && !confirm('यह नोटिफिकेशन समस्त भक्तगण को जाएगा। भेजें?')) return;
 
-  const payload = { app:el('targetApp').value, title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
+  const payload = { app:'hadapsar', title:el('title').value.trim(), body:el('body').value.trim(), imageUrl:el('img').value.trim(),
     actionUrl:a.url, actionType:a.type, openIn:openMode(a.type), topic, isLoudAlert:el('loud').checked, priority:el('priority').value };
   const btn = el('sendBtn'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं…';
   showDiag('', 'FCM को भेजा जा रहा है…');
@@ -470,8 +466,8 @@ async function send(e){
     const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify({...payload, deviceToken:testToken()})});
     const d = await r.json().catch(() => ({}));
     if(r.ok && d.success){
-      showDiag('', `FCM स्वीकार · फोन पर डिलीवरी अपुष्ट · ${esc(d.projectId)}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
-      addHist(payload,'Delivery unconfirmed');
+      showDiag('', `Firebase ने संदेश स्वीकार किया। ${d.receiptHash ? "टेस्ट फोन का कोड डालें।" : "प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।"}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
+      addHist(payload,'Firebase ने स्वीकार किया');
       offerReceipt(el('diag'), d, () => { showDiag('s','टेस्ट फोन पर डिलीवरी की पुष्टि हुई'); addHist(payload,'Test phone confirmed'); });
     }else{
       showDiag('e', `✖ नहीं गया<br>कारण: ${esc(d.reason||('त्रुटि '+r.status))}<br>${esc(d.details||'')}`);
@@ -491,7 +487,7 @@ function renderHist(){
   const h = store.get('fcm_push_history', []);
   el('hist').innerHTML = h.length ? h.map((x,i) => {
     const p = x.p || {title:x.title, actionUrl:x.link, topic:''};
-    return `<div class="hrow" data-h="${i}"><div style="min-width:0"><b>${esc(p.title)}</b><small class="${x.status==='Test phone confirmed'?'okc':''}">${esc(x.status==='Success'?'FCM accepted (unconfirmed)':x.status)}</small> <small>· ${esc(p.actionUrl||'')}</small></div><div class="r">${esc(x.time)}<br>${esc(p.topic||'')}</div></div>`;
+    return `<div class="hrow" data-h="${i}"><div style="min-width:0"><b>${esc(p.title)}</b><small class="${x.status==='Test phone confirmed'?'okc':''}">${esc(x.status==='Success'?'Firebase ने स्वीकार किया':x.status)}</small> <small>· ${esc(p.actionUrl||'')}</small></div><div class="r">${esc(x.time)}<br>${esc(p.topic||'')}</div></div>`;
   }).join('') : '<div class="empty">अभी कोई ब्रॉडकास्ट नहीं भेजा गया।</div>';
 }
 el('hist').addEventListener('click', e => {

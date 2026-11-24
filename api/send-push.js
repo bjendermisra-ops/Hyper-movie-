@@ -1,10 +1,7 @@
 // api/send-push.js (Zero-Dependency Node.js FCM v1 Gateway)
 const crypto = require('crypto');
 
-const projects = new Map([
-  ['original', { id: 'radha-krishna-chandra', secret: 'FIREBASE_SERVICE_ACCOUNT' }],
-  ['hadapsar', { id: 'iskcon-hadapsar-645be', secret: 'HADAPSAR_SERVICE_ACCOUNT' }]
-]);
+const project = { id: 'iskcon-hadapsar-645be', secret: 'HADAPSAR_SERVICE_ACCOUNT' };
 
 function base64url(input) {
   return Buffer.from(input)
@@ -64,8 +61,7 @@ module.exports = async function handler(req, res) {
       !crypto.timingSafeEqual(digest(suppliedKey), digest(process.env.ADMIN_KEY))) {
     return res.status(401).json({ success: false, reason: 'Valid admin key required' });
   }
-  const project = projects.get(req.body?.app);
-  if (!project) return res.status(400).json({ success: false, reason: 'Select a target app' });
+  if (req.body?.app !== undefined && req.body.app !== 'hadapsar') return res.status(400).json({ success: false, reason: 'This sender supports ISKCON Hadapsar only' });
 
   const { title, body, imageUrl, actionUrl, topic, isLoudAlert } = req.body || {};
 
@@ -122,7 +118,7 @@ module.exports = async function handler(req, res) {
           channel_id: isLoudAlert ? "alarm_high_channel" : "general_channel"
         },
         android: {
-          ...(req.body.app === "hadapsar" ? { restricted_package_name: "bhagwat.gita.hindi.and.marathi.dev.santosh" } : {}),
+          restricted_package_name: "bhagwat.gita.hindi.and.marathi.dev.santosh",
           priority: "HIGH"
         }
       }
