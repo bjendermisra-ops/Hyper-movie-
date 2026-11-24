@@ -55,9 +55,6 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ success: false, reason: "Method Not Allowed" });
 
-  if (!require('../lib/access').authorized(req)) {
-    return res.status(401).json({ success: false, reason: 'इस ब्राउज़र में अपना निजी एडमिन लिंक खोलें।' });
-  }
   if (req.body?.app !== undefined && req.body.app !== 'hadapsar') return res.status(400).json({ success: false, reason: 'This sender supports ISKCON Hadapsar only' });
 
   const { title, body, imageUrl, actionUrl, topic, isLoudAlert } = req.body || {};
