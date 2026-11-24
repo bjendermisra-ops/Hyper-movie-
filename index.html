@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <script src="/admin-access.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ISKCON Hadapsar · सूचना केंद्र</title>
@@ -268,8 +269,6 @@
  <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p></details>
  
     </div>
-    <label for="senderKey">एडमिन पासवर्ड</label>
-    <input id="senderKey" class="form-control mb-3" type="password" autocomplete="current-password" required>
 
                     
                     <div class="row g-2">
@@ -415,7 +414,7 @@
         try {
             const response = await fetch('/api/send-push', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-admin-key': document.getElementById('senderKey').value },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ deviceToken: testToken(), app: 'hadapsar', title, body, imageUrl, actionUrl, topic })
             });
 

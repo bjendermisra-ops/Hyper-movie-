@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <script src="/admin-access.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ISKCON Hadapsar · सूचना केंद्र</title>
@@ -119,7 +120,6 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
   <div class="tools">
     <span class="status" id="gw"><i class="dot"></i><span>जाँच रहे हैं…</span></span>
     <button class="btn" onclick="openLib()"><i class="fas fa-bookmark"></i> लिंक लाइब्रेरी</button>
-    <button class="btn" onclick="openKey()"><i class="fas fa-key"></i> Admin Key</button>
   </div>
 </header>
 
@@ -245,12 +245,6 @@ textarea.f{resize:vertical;min-height:84px;line-height:1.5}
   </div>
 </div></div>
 
-<div class="sheet" id="keySheet" onclick="if(event.target===this)closeKey()"><div class="card" style="max-width:420px">
-  <h3>Admin Key</h3>
-  <p class="sub">वैकल्पिक। भरने पर हर रिक्वेस्ट के साथ header में जाएगी (सिर्फ इसी डिवाइस में सेव)। बैकएंड में जाँच जोड़ने पर ही असर होगा।</p>
-  <input id="keyIn" type="password" class="f" placeholder="Admin key">
-  <div style="display:flex;gap:8px"><button class="btn" type="button" onclick="saveKey()">सेव करें</button><button class="btn" type="button" onclick="closeKey()">बंद</button></div>
-</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -438,9 +432,6 @@ function saveTpl(){
 function resetForm(){ el('form').reset(); el('topicC').style.display = 'none'; upd(); }
 
 /* ---------- Admin key & gateway ---------- */
-function openKey(){ el('keyIn').value = store.get('fcm_admin_key',''); el('keySheet').classList.add('on'); }
-function closeKey(){ el('keySheet').classList.remove('on'); }
-function saveKey(){ store.set('fcm_admin_key', el('keyIn').value.trim()); closeKey(); toast('Key सेव हो गई'); }
 async function checkGateway(){
   const g = el('gw'), s = g.lastElementChild;
   try{ const r = await fetch('/api/send-push', {method:'OPTIONS'}); if(!r.ok) throw 0; g.className='status ok'; s.textContent='गेटवे चालू'; }
@@ -463,7 +454,7 @@ async function send(e){
   const btn = el('sendBtn'); btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> भेज रहे हैं…';
   showDiag('', 'FCM को भेजा जा रहा है…');
   try{
-    const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json','x-admin-key':store.get('fcm_admin_key','')}, body:JSON.stringify({...payload, deviceToken:testToken()})});
+    const r = await fetch('/api/send-push', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...payload, deviceToken:testToken()})});
     const d = await r.json().catch(() => ({}));
     if(r.ok && d.success){
       showDiag('', `Firebase ने संदेश स्वीकार किया। ${d.receiptHash ? "टेस्ट फोन का कोड डालें।" : "प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।"}<br>Topic: ${esc(d.targetTopic||topic)} · ${d.isLoud?'अलार्म मोड':'सामान्य'}<br>लिंक: ${esc(d.targetLink||a.url)}`);
@@ -499,7 +490,7 @@ el('hist').addEventListener('click', e => {
 });
 function clearHist(){ localStorage.removeItem('fcm_push_history'); renderHist(); }
 
-document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeLib(); closeKey(); } });
+document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeLib(); } });
 renderLib(); renderTpl(); renderHist(); upd(); tick(); setInterval(tick, 30000); checkGateway();
 </script>
 <script src="/delivery-test.js"></script>
