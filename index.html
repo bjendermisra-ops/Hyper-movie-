@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<script src="/admin-access.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#000000">
+<title>ISKCON Hadapsar · सूचना केंद्र</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;600;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="stylesheet" href="/mandir.css">
+
+<style>
+:root{
+  --bg:#000; --p1:#070A08; --p2:#0C110E; --p3:#111A14;
+  --line:#16301F; --line2:#1F4A2F;
+  --g:#19F58C; --g2:#7CFFC0; --gd:#0A7A44;
+  --red:#FF2D55; --amb:#FFB020; --txt:#E6FFF1; --mute:#7FA48F; --mute2:#4E6E5C;
+  --mono:'JetBrains Mono','Noto Sans Devanagari',monospace;
+  --disp:'Chakra Petch','Noto Sans Devanagari',sans-serif;
+  --body:'Noto Sans Devanagari','Chakra Petch',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body#app{
+  margin:0;min-height:100vh;color:var(--txt);background:var(--bg);font-family:var(--body);line-height:1.5;
+  padding:max(16px,env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom));
+  overflow-x:hidden;position:relative;
+}
+/* grid + vignette */
+body#app::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    linear-gradient(rgba(25,245,140,.045) 1px,transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg,rgba(25,245,140,.045) 1px,transparent 1px) 0 0/44px 44px,
+    radial-gradient(700px 420px at 80% -10%,rgba(25,245,140,.16),transparent 70%),
+    radial-gradient(600px 400px at -10% 100%,rgba(25,245,140,.08),transparent 70%);
+}
+body#app::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.35;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px);
+}
+.wrap{max-width:1200px;margin:0 auto}
+.d-none{display:none!important}
+
+/* ---------- panel with corner brackets ---------- */
+.panel{
+  position:relative;background:linear-gradient(180deg,rgba(12,17,14,.92),rgba(5,8,6,.95));
+  border:1px solid var(--line);border-radius:16px;padding:20px;
+  box-shadow:0 0 0 1px rgba(25,245,140,.03),0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(25,245,140,.08);
+}
+.panel::before,.panel::after{
+  content:"";position:absolute;width:18px;height:18px;border:2px solid var(--g);pointer-events:none;opacity:.8
+}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-radius:16px 0 0 0}
+.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-radius:0 0 16px 0}
+.ptitle{margin:0 0 4px;font:700 1.08rem var(--disp);display:flex;align-items:center;gap:10px;color:#fff}
+.ptitle i{color:var(--g)}
+.tag{font:600 .68rem var(--mono);color:var(--g);border:1px solid var(--gd);padding:2px 8px;border-radius:6px;margin-left:auto;background:rgba(25,245,140,.07)}
+.sub{margin:0 0 16px;color:var(--mute);font-size:.82rem}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.logo{
+  width:54px;height:54px;flex:none;border-radius:14px;display:grid;place-items:center;font-size:23px;color:#001a0c;
+  background:linear-gradient(135deg,var(--g2),var(--g));box-shadow:0 0 0 1px var(--g),0 0 28px rgba(25,245,140,.55);
+}
+.top h1{margin:0;font:700 1.45rem var(--disp);color:#fff;letter-spacing:.5px}
+.top h1 b{color:var(--g);text-shadow:0 0 16px rgba(25,245,140,.7)}
+.top p{margin:0;color:var(--mute);font-size:.84rem}
+.sys{margin-left:auto;text-align:right;font:600 .72rem var(--mono);color:var(--mute)}
+.sys .on{color:var(--g);display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.sys .on i{width:8px;height:8px;border-radius:50%;background:var(--g);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(25,245,140,.7)}80%,100%{box-shadow:0 0 0 9px rgba(25,245,140,0)}}
+#sysClock{color:var(--txt);font-size:.9rem}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--p1)}
+.stat b{display:block;font:700 1.6rem var(--disp);color:var(--g);text-shadow:0 0 14px rgba(25,245,140,.45)}
+.stat:nth-child(3) b{color:var(--red);text-shadow:0 0 14px rgba(255,45,85,.4)}
+.stat span{font-size:.74rem;color:var(--mute)}
+.rate{height:4px;border-radius:9px;background:#0d1f15;margin-top:8px;overflow:hidden}
+.rate i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gd),var(--g));transition:width .6s}
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:980px){.grid{grid-template-columns:1.15fr .85fr;align-items:start}.sticky{position:sticky;top:16px}}
+
+/* ---------- fields ---------- */
+.field{margin-bottom:16px}
+.field>label,.lbl{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.86rem;margin-bottom:7px;color:var(--txt)}
+.lbl small,.field label small{font:500 .7rem var(--mono);color:var(--mute2)}
+.input,.area,#testDevice{
+  width:100%;background:#020403;border:1px solid var(--line2);border-radius:10px;color:var(--g2);
+  padding:13px 14px;font:600 .94rem var(--mono);outline:none;transition:.2s;caret-color:var(--g)
+}
+.area{resize:vertical;min-height:100px;line-height:1.5}
+.input:focus,.area:focus,#testDevice:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(25,245,140,.16),0 0 22px rgba(25,245,140,.15)}
+::placeholder{color:#35503f}
+.count.warn{color:var(--amb)} .count.bad{color:var(--red)}
+
+.tpls{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:12px;scrollbar-width:none}
+.tpls::-webkit-scrollbar{display:none}
+.tpl{flex:none;border:1px solid var(--line2);background:var(--p2);color:var(--txt);padding:9px 14px;border-radius:9px;font:600 .8rem var(--body);cursor:pointer;white-space:nowrap;transition:.15s}
+.tpl:hover{border-color:var(--g);color:var(--g2);box-shadow:0 0 16px rgba(25,245,140,.2)}
+.tpl:active{transform:scale(.96)}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.screens{grid-template-columns:1fr 1fr}
+@media(min-width:560px){.screens{grid-template-columns:repeat(3,1fr)}}
+.choice{
+  display:flex;gap:10px;align-items:center;text-align:left;padding:12px;border-radius:12px;cursor:pointer;
+  border:1px solid var(--line);background:var(--p1);color:var(--txt);font-family:var(--body);transition:.18s
+}
+.choice .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;background:#0a1a11;color:var(--g);border:1px solid var(--line2)}
+.choice b{display:block;font-size:.88rem;line-height:1.25}
+.choice small{color:var(--mute);font-size:.7rem}
+.choice:hover{border-color:var(--gd)}
+.choice.on{border-color:var(--g);background:linear-gradient(135deg,rgba(25,245,140,.14),rgba(25,245,140,.02));box-shadow:0 0 22px rgba(25,245,140,.18)}
+.choice.on .ic{background:var(--g);color:#001a0c;border-color:var(--g)}
+.choice:focus-visible,.tpl:focus-visible,.seg button:focus-visible,.emo button:focus-visible,.ghost:focus-visible,.send:focus-visible{outline:2px solid var(--g2);outline-offset:2px}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:#020403;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+.seg button{border:0;background:transparent;color:var(--mute);padding:10px;border-radius:9px;font:700 .84rem var(--body);cursor:pointer;transition:.2s}
+.seg button.on{background:var(--g);color:#001a0c;box-shadow:0 0 18px rgba(25,245,140,.4)}
+
+.emo{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.emo button{border:1px solid var(--line);background:var(--p2);border-radius:8px;padding:5px 9px;font-size:1.05rem;cursor:pointer}
+.emo button:hover{border-color:var(--g)}
+
+/* loud */
+.loud{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;margin-bottom:18px;border:1px dashed rgba(255,45,85,.5);background:rgba(255,45,85,.06);transition:.25s}
+.loud.on{border-style:solid;background:rgba(255,45,85,.14);box-shadow:0 0 30px rgba(255,45,85,.3)}
+.loud .t{flex:1}
+.loud b{display:flex;gap:8px;align-items:center;color:#FF6B86;font-size:.92rem}
+.loud small{color:var(--mute);font-size:.76rem}
+.sw{position:relative;width:54px;height:30px;flex:none}
+.sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}
+.sw span{position:absolute;inset:0;border-radius:99px;background:#18261d;border:1px solid var(--line2);transition:.25s}
+.sw span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#6d8b7a;transition:.25s}
+.sw input:checked+span{background:var(--red);border-color:var(--red)}
+.sw input:checked+span::after{transform:translateX(24px);background:#fff}
+.sw input:focus-visible+span{outline:2px solid var(--g2);outline-offset:2px}
+
+details.test{margin-bottom:16px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--p1)}
+details.test summary{cursor:pointer;font-weight:700;font-size:.86rem;color:var(--g)}
+details.test label{display:block;margin:12px 0 7px;font-size:.8rem;color:var(--mute)}
+details.test p{margin:8px 0 0;font-size:.78rem;color:var(--mute2)}
+
+/* buttons */
+.send{
+  width:100%;border:0;cursor:pointer;padding:17px;border-radius:14px;color:#001a0c;font:700 1.05rem var(--disp);letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--g2),var(--g));box-shadow:0 0 0 1px var(--g),0 0 34px rgba(25,245,140,.4);transition:.15s
+}
+.send::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:sheen 3.4s infinite}
+@keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+.send:active{transform:scale(.97)}
+.send:disabled{opacity:.55;cursor:not-allowed}
+.send.danger{background:linear-gradient(135deg,#FF7A92,var(--red));color:#fff;box-shadow:0 0 0 1px var(--red),0 0 34px rgba(255,45,85,.45)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ghost{border:1px solid var(--line2);background:var(--p2);color:var(--txt);padding:12px;border-radius:12px;font:600 .82rem var(--body);cursor:pointer;transition:.15s}
+.ghost:hover{border-color:var(--g);color:var(--g2)}
+
+/* terminal diag */
+.diag{margin-top:16px;border-radius:12px;background:#010302;border:1px solid var(--line2);overflow:hidden}
+.diag .bar{display:flex;align-items:center;gap:7px;padding:8px 12px;background:#07100b;border-bottom:1px solid var(--line);font:600 .7rem var(--mono);color:var(--mute)}
+.diag .bar i{width:9px;height:9px;border-radius:50%;background:#2a3a31}
+.diag .bar i:nth-child(1){background:#ff5f57}.diag .bar i:nth-child(2){background:#febc2e}.diag .bar i:nth-child(3){background:#28c840}
+.diag .bar span{margin-left:auto}
+.diag .body{padding:12px 14px;font:500 .8rem var(--mono)}
+.diag .head{font-weight:800;color:var(--g)}
+.diag.err .head{color:var(--red)} .diag.err{border-color:rgba(255,45,85,.5)}
+#termLog{margin-top:8px;color:var(--mute);min-height:20px}
+#termLog div{animation:in .2s}
+@keyframes in{from{opacity:0;transform:translateX(-6px)}}
+#termLog .ok{color:var(--g)} #termLog .er{color:var(--red)} #termLog .wr{color:var(--amb)}
+#diagMessage{margin-top:6px;color:var(--txt)}
+#diagReason{margin-top:6px;color:var(--g2);word-break:break-word}
+.diag.err #diagReason{color:#FF9AAD}
+
+/* payload viewer */
+details.pl{margin-top:14px}
+details.pl summary{cursor:pointer;font:600 .76rem var(--mono);color:var(--mute)}
+details.pl pre{margin:8px 0 0;padding:12px;border-radius:10px;background:#010302;border:1px solid var(--line);color:var(--g2);font:500 .74rem var(--mono);overflow:auto;white-space:pre-wrap;word-break:break-word}
+
+/* ---------- phone ---------- */
+.phone{
+  position:relative;max-width:350px;margin:0 auto;border-radius:44px;padding:14px 12px 24px;background:#000;overflow:hidden;
+  border:2px solid #20402e;box-shadow:0 0 0 7px #050806,0 0 0 8px var(--line2),0 30px 70px rgba(0,0,0,.8),0 0 80px rgba(25,245,140,.14)
+}
+.phone::before{content:"";position:absolute;inset:0;background:radial-gradient(280px 220px at 50% 0,rgba(25,245,140,.22),transparent 70%);pointer-events:none}
+.cam{width:76px;height:20px;border-radius:99px;background:#050805;border:1px solid #12251a;margin:0 auto 12px;position:relative}
+.clock{text-align:center;margin:6px 0 18px;position:relative}
+.clock b{display:block;font:700 2.8rem var(--disp);line-height:1;color:#fff}
+.clock span{font-size:.78rem;color:var(--mute)}
+.notif{position:relative;border-radius:20px;padding:13px 14px;background:rgba(14,22,17,.94);border:1px solid #1d3a29;box-shadow:0 14px 34px rgba(0,0,0,.6);transition:.3s}
+.notif.loudring{border-color:rgba(255,45,85,.8);box-shadow:0 0 0 3px rgba(255,45,85,.16),0 0 36px rgba(255,45,85,.4);animation:ring 1.6s ease-in-out infinite}
+@keyframes ring{0%,100%{transform:rotate(0)}8%{transform:rotate(-1.4deg)}16%{transform:rotate(1.4deg)}24%{transform:rotate(-1deg)}32%{transform:rotate(0)}}
+.n-head{display:flex;align-items:center;gap:8px;font-size:.72rem;color:#9fc4af;font-weight:600;margin-bottom:8px}
+.n-ico{width:20px;height:20px;border-radius:6px;background:var(--g);color:#001a0c;display:grid;place-items:center;font-size:.66rem}
+.n-loud{margin-left:auto;color:#FF6B86;font-weight:800}
+.n-title{font-weight:800;font-size:.97rem;line-height:1.3;word-break:break-word;color:#fff}
+.n-body{font-size:.84rem;color:#b7d4c3;margin-top:3px;word-break:break-word;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.notif.open .n-body{-webkit-line-clamp:unset}
+.n-img{display:none;width:100%;height:150px;object-fit:cover;border-radius:12px;margin-top:10px;background:#0c1a12}
+.n-tap{margin-top:10px;display:inline-flex;gap:7px;align-items:center;font:600 .72rem var(--body);color:var(--g2);background:rgba(25,245,140,.1);border:1px solid rgba(25,245,140,.25);padding:5px 11px;border-radius:99px;max-width:100%}
+.n-tap span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prevtog{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.prevtog button{border:1px solid var(--line2);background:var(--p2);color:var(--txt);padding:7px 14px;border-radius:9px;font:600 .76rem var(--body);cursor:pointer}
+.prevtog button.on{background:var(--g);color:#001a0c;border-color:var(--g)}
+
+/* history */
+.hist{display:grid;gap:8px;max-height:300px;overflow:auto;margin-top:8px}
+.h-item{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;background:var(--p1);border:1px solid var(--line)}
+.h-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--g);box-shadow:0 0 10px var(--g)}
+.h-dot.f{background:var(--red);box-shadow:0 0 10px var(--red)} .h-dot.t{background:var(--amb);box-shadow:0 0 10px var(--amb)}
+.h-main{flex:1;min-width:0}
+.h-main b{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-main small{color:var(--mute);font-size:.72rem}
+.h-time{font:500 .68rem var(--mono);color:var(--mute2);white-space:nowrap}
+.h-re{border:1px solid var(--line2);background:var(--p2);color:var(--g);border-radius:9px;width:34px;height:34px;cursor:pointer}
+.empty{text-align:center;color:var(--mute2);font-size:.84rem;padding:16px}
+.linkbtn{background:none;border:0;color:var(--mute);font:600 .76rem var(--body);cursor:pointer;margin-left:auto}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{width:100%;max-width:520px;background:#050806;border:1px solid var(--g);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 0 60px rgba(25,245,140,.2);animation:up .28s ease-out}
+@keyframes up{from{transform:translateY(60px);opacity:0}}
+@media(min-width:600px){.sheet-bg{align-items:center}.sheet{border-radius:22px}}
+.sheet h3{margin:0 0 12px;font:700 1.12rem var(--disp);display:flex;gap:10px;align-items:center}
+.sheet h3 i{color:var(--g)}
+.sum{display:grid;gap:8px;margin-bottom:16px}
+.sum div{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;padding:10px 12px;background:var(--p1);border-radius:10px;border:1px solid var(--line)}
+.sum span{color:var(--mute)} .sum b{text-align:right;word-break:break-word}
+.warnbox{padding:11px 13px;border-radius:10px;background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.45);color:#FF9AAD;font-size:.82rem;margin-bottom:14px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;z-index:80;background:var(--g);color:#001a0c;padding:11px 18px;border-radius:10px;font-weight:700;font-size:.84rem;transition:.3s;pointer-events:none;max-width:90vw;box-shadow:0 0 30px rgba(25,245,140,.5)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* boot screen (one moment) */
+#boot{position:fixed;inset:0;z-index:100;background:#000;display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .5s}
+#boot pre{margin:0;font:500 .8rem var(--mono);color:var(--g);line-height:1.9;text-shadow:0 0 10px rgba(25,245,140,.6);white-space:pre-wrap}
+#boot.hide{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ================= RESPONSIVE + ZOOM FIX ================= */
+html{font-size:clamp(14px,12px + .5vw,17px);max-width:100%;overflow-x:hidden;scroll-behavior:smooth}
+body#app{
+  max-width:100vw;overflow-x:clip;min-height:100vh;min-height:100dvh;touch-action:manipulation;
+  padding-left:max(clamp(10px,3vw,26px),env(safe-area-inset-left));
+  padding-right:max(clamp(10px,3vw,26px),env(safe-area-inset-right));
+}
+/* asli wajah: grid/flex bachche content ke barabar chaude ho jaate the */
+.wrap,.grid>*,.panel,.field,.choices>*,.choice>span:last-child,.top>div,.row2>*,.h-main,.stat,.sum div b{min-width:0}
+.grid{grid-template-columns:minmax(0,1fr)}
+@media(min-width:980px){
+  .grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+  .sticky{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;scrollbar-width:none}
+  .sticky::-webkit-scrollbar{display:none}
+}
+@media(min-width:1500px){.wrap{max-width:1380px}}
+@media(min-width:1900px){.wrap{max-width:1560px}}
+
+/* inputs: 16px se kam hone par phone khud zoom kar deta hai */
+.input,.area,#testDevice,select{font-size:16px;max-width:100%}
+img,svg,pre{max-width:100%}
+.panel{padding:clamp(14px,3.6vw,22px)}
+.tpls{max-width:100%;overscroll-behavior-x:contain}
+.choices{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.choices.screens{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+.stat b{font-size:clamp(1.25rem,5.5vw,1.7rem)}
+.stat span{display:block;overflow-wrap:anywhere}
+.top h1{font-size:clamp(1.15rem,5vw,1.6rem)}
+.n-title,.n-body,.n-tap,.h-main small,.sum b,#diagMessage,#diagReason{overflow-wrap:anywhere}
+.phone{max-width:min(350px,100%)}
+.sheet{max-height:92vh;max-height:92dvh;overflow-y:auto}
+
+@media(max-width:520px){
+  .sys{margin-left:0;width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left}
+  .sys .on{justify-content:flex-start}
+  .row2{grid-template-columns:1fr}
+  .stats{gap:8px}
+  .stat{padding:10px}
+  .loud{padding:12px}
+  .ptitle{flex-wrap:wrap}
+}
+@media(max-width:360px){
+  .choice{padding:10px;gap:8px}
+  .choice .ic{width:34px;height:34px}
+  .logo{width:46px;height:46px;font-size:19px}
+  .send{font-size:.98rem;padding:15px}
+}
+/* chhoti height (landscape phone) */
+@media(max-height:480px) and (orientation:landscape){
+  .clock b{font-size:2rem}.clock{margin:2px 0 10px}
+  .sheet{padding-top:14px}
+}
+@media(hover:none){.send::after{animation-duration:5s}}
+</style>
+</head>
+
+<body id="app">
+
+<div id="boot"><pre id="bootText"></pre></div>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo"><i class="fas fa-tower-broadcast"></i></div>
+    <div>
+      <h1>ISKCON <b>Hadapsar</b></h1>
+      <p>मंदिर सूचना केंद्र · कमांड सेंटर</p>
+    </div>
+    <div class="sys">
+      <div class="on"><i></i> सिस्टम चालू</div>
+      <div id="sysClock">--:--:--</div>
+    </div>
+  </header>
+
+  <section class="stats" aria-label="आँकड़े">
+    <div class="stat"><b id="stToday">0</b><span>हाल के प्रसारण</span></div>
+    <div class="stat"><b id="stOk">0</b><span>सफल</span><div class="rate"><i id="rateBar"></i></div></div>
+    <div class="stat"><b id="stFail">0</b><span>असफल</span></div>
+  </section>
+
+  <div class="grid">
+
+    <!-- ============ FORM ============ -->
+    <main class="panel">
+      <h2 class="ptitle"><i class="fas fa-satellite-dish"></i> नई सूचना लिखें <span class="tag">COMPOSE</span></h2>
+      <p class="sub">तैयार संदेश चुनें या अपना लिखें। फोन का लाइव प्रीव्यू साथ में दिखेगा।</p>
+
+      <div class="tpls" id="tpls" aria-label="तैयार संदेश"></div>
+
+      <form id="pushForm" onsubmit="handleSendPush(event)" autocomplete="off">
+
+        <details class="test">
+          <summary>एक फोन पर टेस्ट करें</summary>
+          <label for="testDevice">टेस्ट फोन का कोड</label>
+          <input id="testDevice" type="password" autocomplete="off" placeholder="टेस्ट कोड">
+          <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p>
+        </details>
+
+        <div class="field">
+          <div class="lbl">किसे भेजना है <small>topic</small></div>
+          <select id="pushTopic" class="d-none" required>
+            <option value="all">समस्त भक्तगण</option>
+            <option value="darshan">दैनिक दर्शन सब्सक्राइबर</option>
+          </select>
+          <div class="choices" id="topicChoices">
+            <button type="button" class="choice on" data-v="all"><span class="ic"><i class="fas fa-users"></i></span><span><b>समस्त भक्तगण</b><small>ऐप वाले सभी</small></span></button>
+            <button type="button" class="choice" data-v="darshan"><span class="ic"><i class="fas fa-om"></i></span><span><b>दर्शन सब्सक्राइबर</b><small>रोज़ के दर्शन वाले</small></span></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="lbl" id="actionLabel">टैप करने पर क्या खुले <small>action</small></div>
+          <select id="linkMode" class="d-none"><option value="internal">internal</option><option value="external">external</option></select>
+          <div class="seg">
+            <button type="button" id="segInternal" class="on" onclick="setMode('internal')"><i class="fas fa-mobile-screen"></i> ऐप का पेज</button>
+            <button type="button" id="segExternal" onclick="setMode('external')"><i class="fas fa-globe"></i> बाहरी लिंक</button>
+          </div>
+          <div id="internalBox">
+            <select id="pushInternalScreen" class="d-none"></select>
+            <div class="choices screens" id="screenChoices"></div>
+          </div>
+          <div id="externalBox" class="d-none">
+            <input type="url" id="pushCustomUrl" class="input" inputmode="url" placeholder="https://youtube.com/live/... या Play Store लिंक" oninput="updatePreview()">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pushTitle">शीर्षक <small class="count" id="cTitle">0 / 60</small></label>
+          <input type="text" id="pushTitle" class="input" maxlength="100" placeholder="जैसे: महाआरती शुरू हो चुकी है" required oninput="updatePreview()">
+          <div class="emo" id="emo"></div>
+        </div>
+
+        <div class="field">
+          <label for="pushBody">संदेश <small class="count" id="cBody">0 / 200</small></label>
+          <textarea id="pushBody" class="area" rows="3" maxlength="500" placeholder="भक्तों के लिए पावन संदेश लिखें..." required oninput="updatePreview()"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="pushImage">बैनर फोटो <small>direct image link, optional</small></label>
+          <input type="url" id="pushImage" class="input" inputmode="url" placeholder="https://.../banner.jpg" oninput="updatePreview()">
+        </div>
+
+        <button type="submit" id="submitBtn" class="send"><i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें</button>
+        <div style="margin-top:10px"><button type="button" class="ghost" style="width:100%" onclick="clearForm()"><i class="fas fa-eraser"></i> फॉर्म खाली करें</button></div>
+      </form>
+
+      <div id="diagConsole" class="diag d-none">
+        <div class="bar"><i></i><i></i><i></i><span id="diagTimestamp"></span></div>
+        <div class="body">
+          <div class="head" id="diagStatusHead">स्थिति</div>
+          <div id="termLog"></div>
+          <div id="diagMessage"></div>
+          <div id="diagReason"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============ PREVIEW + HISTORY ============ -->
+    <aside class="sticky">
+      <div class="panel">
+        <h2 class="ptitle"><i class="fas fa-mobile-screen"></i> फोन पर कैसा दिखेगा <span class="tag">LIVE</span></h2>
+        <p class="sub">लॉक स्क्रीन का असली जैसा नज़ारा।</p>
+
+        <div class="phone">
+          <div class="cam"></div>
+          <div class="clock"><b id="pvClock">12:00</b><span id="pvDate"></span></div>
+          <div class="notif" id="notif">
+            <div class="n-head">
+              <div class="n-ico"><i class="fas fa-bell"></i></div>
+              <span>ISKCON Hadapsar</span><span style="opacity:.55">· अभी</span>
+            </div>
+            <div class="n-title" id="prevTitle">शीर्षक यहाँ दिखेगा</div>
+            <div class="n-body" id="prevBody">आपका पावन संदेश यहाँ दिखेगा</div>
+            <img id="prevImg" class="n-img" src="" alt="">
+            <div class="n-tap" id="prevLinkPill"><i class="fas fa-hand-pointer"></i> <span id="prevLinkText">होम खुलेगा</span></div>
+          </div>
+        </div>
+
+        <div class="prevtog">
+          <button type="button" id="pvSmall" onclick="setExpand(false)">छोटा</button>
+          <button type="button" id="pvBig" class="on" onclick="setExpand(true)">पूरा खुला</button>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <div style="display:flex;align-items:center">
+          <h2 class="ptitle" style="margin:0"><i class="fas fa-clock-rotate-left"></i> हालिया प्रसारण</h2>
+          <button class="linkbtn" onclick="clearHistory()">सब हटाएँ</button>
+        </div>
+        <div class="hist" id="historyBody"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- confirm sheet -->
+<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+    <h3 id="shTitle"><i class="fas fa-shield-halved"></i> भेजने से पहले जाँच लें</h3>
+    <div class="sum" id="sheetSum"></div>
+    <div class="warnbox d-none" id="sheetWarn"></div>
+    <button class="send" id="confirmBtn" type="button" onclick="confirmSend()"><i class="fas fa-paper-plane"></i> हाँ, अभी भेजें</button>
+    <button class="ghost" style="width:100%;margin-top:10px" type="button" onclick="closeSheet()">रुकें, बदलाव करूँगा</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= CONFIG ================= */
+// v = ऐप को भेजा जाने वाला असली पेज; name = स्क्रीन पर दिखने वाला नाम
+const SCREENS = [
+  { v:'index.html',         name:'होम',            sub:'मुख्य पेज',       icon:'fa-house' },
+  { v:'daily_darshan.html', name:'दैनिक दर्शन',    sub:'दर्शन और सेवा',   icon:'fa-om' },
+  { v:'global_jap.html',    name:'लाइव जप',        sub:'ग्लोबल जप',       icon:'fa-hands-praying' },
+  { v:'calendar.html',      name:'एकादशी कैलेंडर', sub:'तिथियाँ',          icon:'fa-calendar-days' },
+  { v:'dono.html',          name:'दान / सेवा',     sub:'सेवा में योगदान',  icon:'fa-hand-holding-heart' }
+];
+const TEMPLATES = [
+  { n:'🔴 महाआरती लाइव', t:'🔴 महाआरती शुरू हो चुकी है', b:'हरे कृष्ण! श्री श्री राधा कृष्णचंद्र की महाआरती का लाइव दर्शन करें।', topic:'all', screen:'daily_darshan.html' },
+  { n:'🌸 आज के दर्शन', t:'🌸 आज के दर्शन तैयार हैं', b:'आज के श्रृंगार दर्शन का आनंद लें। हरे कृष्ण!', topic:'darshan', screen:'daily_darshan.html' },
+  { n:'🌙 एकादशी', t:'🌙 कल एकादशी है', b:'कल एकादशी व्रत है। पारण का समय कैलेंडर में देखें।', topic:'all', screen:'calendar.html' },
+  { n:'📿 जप', t:'📿 आइए, साथ में जप करें', b:'ग्लोबल जप में जुड़िए और आज की माला पूरी कीजिए।', topic:'all', screen:'global_jap.html' },
+  { n:'🙏 सेवा अपील', t:'🙏 सेवा में सहभागी बनें', b:'आपकी छोटी सी सेवा भी भगवान को प्रिय है। हरे कृष्ण!', topic:'all', screen:'dono.html' }
+];
+const EMOJIS = ['🙏','🪔','🌸','🔴','📿','🕉️','🌙','✨','🎉','📢'];
+const HKEY='fcm_push_history', DKEY='np_draft';
+
+const $ = id => document.getElementById(id);
+let expand = true, pendingPayload = null;
+
+/* ================= BOOT (एक बार) ================= */
+function boot(){
+  const b=$('boot');
+  let seen=false; try{seen=sessionStorage.getItem('np_boot')}catch(_){}
+  if(seen || matchMedia('(prefers-reduced-motion:reduce)').matches){ b.remove(); return; }
+  const lines=['> सिस्टम शुरू हो रहा है...','> सुरक्षित कनेक्शन ... OK','> सूचना केंद्र चालू। हरे कृष्ण 🙏'];
+  let i=0; const el=$('bootText');
+  const t=setInterval(()=>{
+    if(i<lines.length){ el.textContent+=lines[i++]+'\n'; }
+    else{ clearInterval(t); setTimeout(()=>{b.classList.add('hide');setTimeout(()=>b.remove(),500)},350); }
+  },260);
+  try{sessionStorage.setItem('np_boot','1')}catch(_){}
+}
+
+/* ================= UI BUILD ================= */
+function buildUI(){
+  $('pushInternalScreen').innerHTML = SCREENS.map(s=>`<option value="${s.v}">${s.name}</option>`).join('');
+  $('screenChoices').innerHTML = SCREENS.map((s,i)=>`
+    <button type="button" class="choice ${i===0?'on':''}" data-v="${s.v}">
+      <span class="ic"><i class="fas ${s.icon}"></i></span>
+      <span><b>${s.name}</b><small>${s.sub}</small></span>
+    </button>`).join('');
+  $('screenChoices').onclick = e=>{ const b=e.target.closest('.choice'); if(!b) return; setScreen(b.dataset.v); updatePreview(); };
+  $('topicChoices').onclick  = e=>{ const b=e.target.closest('.choice'); if(!b) return; setTopic(b.dataset.v); updatePreview(); };
+  $('tpls').innerHTML = TEMPLATES.map((t,i)=>`<button type="button" class="tpl" onclick="applyTpl(${i})">${t.n}</button>`).join('');
+  $('emo').innerHTML = EMOJIS.map(e=>`<button type="button" onclick="addEmoji('${e}')" aria-label="emoji ${e}">${e}</button>`).join('');
+}
+function setTopic(v){
+  $('pushTopic').value=v;
+  document.querySelectorAll('#topicChoices .choice').forEach(c=>c.classList.toggle('on',c.dataset.v===v));
+}
+function setScreen(v){
+  $('pushInternalScreen').value=v;
+  document.querySelectorAll('#screenChoices .choice').forEach(c=>c.classList.toggle('on',c.dataset.v===v));
+}
+function setMode(m){
+  $('linkMode').value=m;
+  $('segInternal').classList.toggle('on',m==='internal');
+  $('segExternal').classList.toggle('on',m==='external');
+  $('internalBox').classList.toggle('d-none',m!=='internal');
+  $('externalBox').classList.toggle('d-none',m!=='external');
+  updatePreview();
+}
+function switchLinkMode(){ setMode($('linkMode').value); }
+
+function applyTpl(i){
+  const t=TEMPLATES[i];
+  $('pushTitle').value=t.t; $('pushBody').value=t.b;
+  setTopic(t.topic); setMode('internal'); setScreen(t.screen);
+  updatePreview(); toast('तैयार संदेश लग गया');
+}
+function addEmoji(e){
+  const el=$('pushTitle'), s=el.selectionStart??el.value.length, en=el.selectionEnd??s;
+  el.value=el.value.slice(0,s)+e+el.value.slice(en);
+  el.focus(); el.setSelectionRange(s+e.length,s+e.length); updatePreview();
+}
+
+/* ================= ACTION / PREVIEW ================= */
+function screenName(v){ const s=SCREENS.find(x=>x.v===v); return s?s.name:v; }
+function getSelectedActionUrl(){
+  return $('linkMode').value==='external' ? $('pushCustomUrl').value.trim() : $('pushInternalScreen').value;
+}
+function friendlyTarget(){
+  if($('linkMode').value==='external'){
+    const u=$('pushCustomUrl').value.trim();
+    if(!u) return 'बाहरी लिंक खुलेगा';
+    try{ return new URL(u).hostname.replace('www.',''); }catch(_){ return u; }
+  }
+  return screenName($('pushInternalScreen').value)+' खुलेगा';
+}
+function setCount(id,len,soft,hard){
+  const el=$(id); el.textContent=len+' / '+soft;
+  el.className='count'+(len>hard?' bad':len>soft?' warn':'');
+}
+function updatePreview(){
+  const title=$('pushTitle').value.trim(), body=$('pushBody').value.trim(), img=$('pushImage').value.trim();
+  $('prevTitle').textContent=title||'शीर्षक यहाँ दिखेगा';
+  $('prevBody').textContent=body||'आपका पावन संदेश यहाँ दिखेगा';
+  $('prevLinkText').textContent=friendlyTarget();
+  setCount('cTitle',$('pushTitle').value.length,60,90);
+  setCount('cBody',$('pushBody').value.length,200,400);
+  const pi=$('prevImg');
+  if(img && /^https?:\/\//i.test(img)){
+    pi.onerror=()=>{pi.style.display='none'};
+    pi.onload=()=>{pi.style.display=expand?'block':'none'};
+    pi.src=img;
+  } else { pi.style.display='none'; pi.removeAttribute('src'); }
+  saveDraft();
+}
+function setExpand(v){
+  expand=v;
+  $('notif').classList.toggle('open',v);
+  $('pvBig').classList.toggle('on',v); $('pvSmall').classList.toggle('on',!v);
+  const pi=$('prevImg'); pi.style.display=(v&&pi.getAttribute('src'))?'block':'none';
+}
+function tickClock(){
+  const d=new Date();
+  $('pvClock').textContent=d.toLocaleTimeString('hi-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
+  $('pvDate').textContent=d.toLocaleDateString('hi-IN',{weekday:'long',day:'numeric',month:'long'});
+  $('sysClock').textContent=d.toLocaleTimeString('en-GB');
+}
+
+/* ================= DRAFT ================= */
+function saveDraft(){
+  try{ localStorage.setItem(DKEY,JSON.stringify({
+    t:$('pushTitle').value,b:$('pushBody').value,i:$('pushImage').value,u:$('pushCustomUrl').value,
+    topic:$('pushTopic').value,screen:$('pushInternalScreen').value,mode:$('linkMode').value
+  })); }catch(_){}
+}
+function loadDraft(){
+  try{
+    const d=JSON.parse(localStorage.getItem(DKEY)||'null'); if(!d) return;
+    $('pushTitle').value=d.t||''; $('pushBody').value=d.b||''; $('pushImage').value=d.i||''; $('pushCustomUrl').value=d.u||'';
+    setTopic(d.topic||'all');
+    setScreen(SCREENS.some(s=>s.v===d.screen)?d.screen:'index.html');
+    setMode(d.mode||'internal');
+  }catch(_){}
+}
+function clearForm(){
+  ['pushTitle','pushBody','pushImage','pushCustomUrl'].forEach(i=>$(i).value='');
+  setTopic('all'); setScreen('index.html'); setMode('internal');
+  try{localStorage.removeItem(DKEY)}catch(_){}
+  updatePreview(); toast('फॉर्म खाली हो गया');
+}
+
+/* ================= SEND FLOW ================= */
+function collect(){
+  return { title:$('pushTitle').value.trim(), body:$('pushBody').value.trim(), imageUrl:$('pushImage').value.trim(),
+    actionUrl:getSelectedActionUrl(), topic:$('pushTopic').value, isLoudAlert:false, mode:$('linkMode').value };
+}
+function validate(p){
+  if(!p.title) return 'शीर्षक खाली है।';
+  if(!p.body) return 'संदेश खाली है।';
+  if(p.mode==='external' && !/^https?:\/\/\S+\.\S+/i.test(p.actionUrl)) return 'बाहरी लिंक सही नहीं है। https:// से शुरू होने वाला पूरा लिंक डालें।';
+  if(p.imageUrl && !/^https?:\/\//i.test(p.imageUrl)) return 'बैनर फोटो का लिंक https:// से शुरू होना चाहिए।';
+  return '';
+}
+function handleSendPush(e){
+  e.preventDefault();
+  const p=collect(), err=validate(p);
+  if(err){ showErr('जाँच करें',err); return; }
+  pendingPayload=p;
+  const test=(typeof testToken==='function' && testToken())?true:false;
+  const rows=[
+    ['किसे', test?'सिर्फ टेस्ट फोन':(p.topic==='all'?'समस्त भक्तगण':'दर्शन सब्सक्राइबर')],
+    ['शीर्षक', p.title],
+    ['क्या खुलेगा', p.mode==='external'?p.actionUrl:screenName(p.actionUrl)],
+    ['फोटो', p.imageUrl?'हाँ':'नहीं']
+  ];
+  $('sheetSum').innerHTML=rows.map(r=>`<div><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join('');
+  const w=$('sheetWarn'), cb=$('confirmBtn');
+  if(!test && p.topic==='all'){
+    w.textContent='यह सभी भक्तों को जाएगा। भेजने के बाद वापस नहीं लिया जा सकता।';
+    w.classList.remove('d-none'); cb.classList.remove('danger');
+  } else { w.classList.add('d-none'); cb.classList.remove('danger'); }
+  $('sheetBg').classList.add('show');
+}
+function closeSheet(){ $('sheetBg').classList.remove('show'); }
+
+function tlog(t,c){ const d=document.createElement('div'); if(c) d.className=c; d.textContent=t; $('termLog').appendChild(d); }
+
+async function confirmSend(){
+  closeSheet();
+  const p=pendingPayload; if(!p) return;
+  const btn=$('submitBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> भेजा जा रहा है...';
+  const dc=$('diagConsole'), head=$('diagStatusHead'), msg=$('diagMessage'), why=$('diagReason');
+  dc.classList.remove('d-none','err');
+  head.textContent='> भेजा जा रहा है'; msg.textContent=''; why.textContent='';
+  $('termLog').innerHTML='';
+  $('diagTimestamp').textContent=new Date().toLocaleTimeString();
+  tlog('$ सूचना तैयार ... OK','ok');
+  tlog('$ भेजी जा रही है ...');
+  if(navigator.vibrate) navigator.vibrate(30);
+
+  const meta={body:p.body,topic:p.topic,loud:p.isLoudAlert,img:p.imageUrl,mode:p.mode};
+  try{
+    const res=await fetch('/api/send-push',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({deviceToken:testToken(),app:'hadapsar',title:p.title,body:p.body,imageUrl:p.imageUrl,actionUrl:p.actionUrl,topic:p.topic,isLoudAlert:p.isLoudAlert})
+    });
+    const data=await res.json();
+    $('diagTimestamp').textContent=new Date().toLocaleTimeString();
+
+    if(res.ok && data.success){
+      tlog('< भेज दी गई ✓','ok');
+      head.textContent='सूचना भेज दी गई';
+      msg.textContent=data.receiptHash?'टेस्ट फोन पर आया कोड नीचे डालें।':'प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।';
+      why.textContent='लक्ष्य: '+(data.targetTopic||p.topic);
+      saveToHistory({title:p.title,link:data.targetLink||p.actionUrl,status:'Success',time:new Date().toLocaleTimeString(),...meta});
+      offerReceipt(why,data,()=>{
+        head.textContent='टेस्ट फोन पर डिलीवरी की पुष्टि हुई';
+        saveToHistory({title:p.title,link:p.actionUrl,status:'Test phone confirmed',time:new Date().toLocaleTimeString(),...meta});
+      });
+      toast('भेज दिया गया 🙏');
+    } else {
+      dc.classList.add('err');
+      tlog('< विफल','er');
+      head.textContent='भेजना विफल रहा';
+      msg.textContent='कारण: '+(data.reason||'अज्ञात त्रुटि');
+      why.textContent=data.details||'कोई विवरण उपलब्ध नहीं।';
+      saveToHistory({title:p.title,link:p.actionUrl,status:'Failed',time:new Date().toLocaleTimeString(),...meta});
+    }
+  }catch(netErr){
+    dc.classList.add('err');
+    tlog('< कनेक्शन टूटा','er');
+    head.textContent='सर्वर से कनेक्शन नहीं हुआ';
+    msg.textContent='इंटरनेट जाँचें और फिर कोशिश करें। सर्वर नहीं मिला।';
+    why.textContent=netErr.message;
+    saveToHistory({title:p.title,link:p.actionUrl,status:'Gateway Error',time:new Date().toLocaleTimeString(),...meta});
+  }finally{
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें';
+    dc.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+function showErr(h,m){
+  const dc=$('diagConsole'); dc.classList.remove('d-none'); dc.classList.add('err');
+  $('termLog').innerHTML='';
+  $('diagStatusHead').textContent=h; $('diagMessage').textContent=m; $('diagReason').textContent='';
+  $('diagTimestamp').textContent=new Date().toLocaleTimeString();
+  dc.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ================= HISTORY ================= */
+function getHist(){ try{return JSON.parse(localStorage.getItem(HKEY)||'[]')}catch(_){return[]} }
+function saveToHistory(item){
+  const h=getHist(); h.unshift(item); if(h.length>20) h.pop();
+  try{localStorage.setItem(HKEY,JSON.stringify(h))}catch(_){}
+  renderHistory();
+}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+function statusLabel(s){
+  if(s==='Success'||/Firebase/.test(s||'')) return 'भेज दी गई';
+  if(s==='Failed') return 'विफल';
+  if(s==='Gateway Error') return 'कनेक्शन त्रुटि';
+  if(s==='Test phone confirmed') return 'टेस्ट फोन पर पहुँची';
+  return s||'';
+}
+function isFail(s){return /fail|error/i.test(s||'')}
+function renderHistory(){
+  const h=getHist(), box=$('historyBody');
+  const fail=h.filter(x=>isFail(x.status)).length;
+  const ok=h.filter(x=>!isFail(x.status)&&x.status!=='Test phone confirmed').length;
+  $('stOk').textContent=ok; $('stFail').textContent=fail; $('stToday').textContent=ok+fail;
+  $('rateBar').style.width=(ok+fail?Math.round(ok/(ok+fail)*100):0)+'%';
+  if(!h.length){ box.innerHTML='<div class="empty">अभी कोई प्रसारण नहीं हुआ। बाईं ओर से पहली सूचना भेजें।</div>'; return; }
+  box.innerHTML=h.map((x,i)=>{
+    const cls=isFail(x.status)?'f':(x.status==='Test phone confirmed'?'t':'');
+    const st=statusLabel(x.status);
+    const where=/^https?:/i.test(x.link||'')?'बाहरी लिंक':screenName(x.link||'');
+    return `<div class="h-item"><span class="h-dot ${cls}"></span>
+      <div class="h-main"><b>${esc(x.title)}</b><small>${esc(st)} · ${esc(where)}</small></div>
+      <span class="h-time">${esc(x.time)}</span>
+      ${x.body?`<button class="h-re" onclick="reuse(${i})" title="दोबारा उपयोग करें" aria-label="दोबारा उपयोग करें"><i class="fas fa-rotate-right"></i></button>`:''}
+    </div>`;
+  }).join('');
+}
+function reuse(i){
+  const x=getHist()[i]; if(!x) return;
+  $('pushTitle').value=x.title||''; $('pushBody').value=x.body||''; $('pushImage').value=x.img||'';
+  setTopic(x.topic||'all');
+  if(x.mode==='external'){ $('pushCustomUrl').value=x.link||''; setMode('external'); }
+  else { setMode('internal'); setScreen(SCREENS.some(s=>s.v===x.link)?x.link:'index.html'); }
+  updatePreview(); window.scrollTo({top:0,behavior:'smooth'}); toast('पुरानी सूचना फॉर्म में भर गई');
+}
+function clearHistory(){
+  if(!getHist().length) return;
+  if(!confirm('सारा हालिया लॉग हटा दें?')) return;
+  try{localStorage.removeItem(HKEY)}catch(_){}
+  renderHistory();
+}
+
+/* ================= EXTRAS ================= */
+let tt; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2200); }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeSheet();
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter') $('pushForm').requestSubmit();
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  boot(); buildUI(); loadDraft(); setExpand(true); renderHistory(); updatePreview(); tickClock(); setInterval(tickClock,1000);
+});
+</script>
+<script src="/delivery-test.js"></script>
+</body>
+</html>
