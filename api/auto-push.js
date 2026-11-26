@@ -1,0 +1,100 @@
+const crypto = require('node:crypto');
+const {authorized,startSession}=require('../lib/access');
+const send=require('./send-push');
+const PROJECT='iskcon-hadapsar-645be';
+const ROOT='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents';
+const COLLECTION='hadapsar_auto_push';
+const HOURS=Array.from({length:17},(_,i)=>i+5);
+const DEFAULT={enabled:true,random:true,limit:3,hours:[5,8,12,18,21],custom:[]};
+const templates=[
+['🌅 हरे कृष्ण! सुप्रभात','आज के दिन की शुरुआत भगवान के स्मरण से करें।','index.html'],
+['🙏 मंगलमय दिन','श्रीकृष्ण का नाम लें और दिन को भक्तिमय बनाएं।','index.html'],
+['🌸 दर्शन का आनंद','कुछ क्षण भगवान के दर्शन और स्मरण के लिए निकालें।','daily_darshan.html'],
+['📿 हरिनाम','आज कुछ समय हरिनाम जप के लिए समर्पित करें।','global_jap.html'],
+['💛 कृष्ण स्मरण','व्यस्त दिन में भी भगवान को याद करने का एक अवसर निकालें।','index.html'],
+['🪷 भक्ति का एक कदम','आज एक छोटा सा सत्कर्म भगवान को समर्पित करें।','index.html'],
+['🎶 कीर्तन का आनंद','हरिनाम के साथ अपने मन को शांत और प्रसन्न करें।','index.html'],
+['🙏 सेवा भाव','आज किसी की सहायता करें और प्रेम से सेवा करें।','dono.html'],
+['🌼 मन की शांति','कुछ क्षण शांत बैठें और हरे कृष्ण महामंत्र का जप करें।','global_jap.html'],
+['📖 आध्यात्मिक चिंतन','आज थोड़ा समय भगवद्गीता के अध्ययन के लिए निकालें।','index.html'],
+['🕉️ हरिनाम संकीर्तन','हरे कृष्ण हरे कृष्ण, कृष्ण कृष्ण हरे हरे।','global_jap.html'],
+['🌺 भक्तिमय संध्या','दिन के अंत में भगवान का आभार व्यक्त करें।','index.html'],
+['🌙 शुभ रात्रि','श्रीकृष्ण का स्मरण करते हुए विश्राम करें। हरे कृष्ण!','index.html'],
+['🪔 प्रेम और भक्ति','भगवान के प्रति प्रेम और सभी के प्रति करुणा रखें।','index.html'],
+['🌿 आज की प्रेरणा','हर परिस्थिति में धैर्य, नम्रता और सेवा भाव बनाए रखें।','index.html'],
+['🙏 कृतज्ञता','आज प्राप्त हर अवसर के लिए भगवान का धन्यवाद करें।','index.html'],
+['🌷 हरे कृष्ण महाप्रभु','अपने घर में कुछ समय भक्तिमय वातावरण बनाएं।','index.html'],
+['🎵 नाम की महिमा','हरिनाम कीर्तन सुनें और मन को भगवान की ओर लगाएं।','index.html'],
+['💐 भक्तों का संग','आज परिवार के साथ भगवान की चर्चा करें।','index.html'],
+['✨ भक्ति की प्रेरणा','छोटे-छोटे प्रयासों से अपनी साधना को नियमित बनाएं।','index.html'],
+['🌻 प्रसन्न रहें','भगवान का स्मरण करें और अपने आसपास प्रेम बांटें।','index.html'],
+['📿 जप का समय','थोड़ा समय निकालकर ध्यान से महामंत्र का जप करें।','global_jap.html'],
+['🌸 आज का संकल्प','आज अपने कार्य प्रेम और ईमानदारी से करें।','index.html'],
+['🙏 प्रभु का स्मरण','अपने परिवार के साथ कुछ क्षण प्रार्थना करें।','index.html']
+];
+function b64(x){return Buffer.from(JSON.stringify(x)).toString('base64url')}
+async function token(){
+ const a=JSON.parse(process.env.HADAPSAR_SERVICE_ACCOUNT||'null');
+ if(!a||a.project_id!==PROJECT)throw Error('Service account unavailable');
+ const now=Math.floor(Date.now()/1000);
+ const input=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:a.client_email,scope:'https://www.googleapis.com/auth/cloud-platform',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+3600});
+ const jwt=input+'.'+crypto.sign('RSA-SHA256',Buffer.from(input),a.private_key).toString('base64url');
+ const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:jwt})});
+ const j=await r.json();if(!r.ok||!j.access_token)throw Error('Google OAuth failed');return j.access_token;
+}
+async function db(t,path,method='GET',body){
+ const r=await fetch(ROOT+'/'+path,{method,headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+ const j=await r.json();return {status:r.status,ok:r.ok,j};
+}
+async function ready(t){const r=await db(t,COLLECTION+'?pageSize=1');if(!r.ok)throw Error('Firestore unavailable (HTTP '+r.status+')');}
+function field(v){return {stringValue:JSON.stringify(v)}}
+function unpack(x){return JSON.parse(x.fields.payload.stringValue)}
+function valid(x){
+ if(!x||typeof x.enabled!=='boolean'||typeof x.random!=='boolean'||!Number.isInteger(x.limit)||x.limit<1||x.limit>5||!Array.isArray(x.hours)||!x.hours.length||x.hours.some(h=>!HOURS.includes(h)))throw Error('Invalid settings');
+ if(!Array.isArray(x.custom)||x.custom.length>50)throw Error('Invalid custom messages');
+ const custom=x.custom.map(m=>{if(!m||typeof m.title!=='string'||typeof m.body!=='string'||!m.title.trim()||!m.body.trim()||m.title.length>100||m.body.length>250)throw Error('Invalid custom message');return {title:m.title.trim(),body:m.body.trim(),actionUrl:'index.html'}});
+ return {enabled:x.enabled,random:x.random,limit:x.limit,hours:[...new Set(x.hours)].sort((a,b)=>a-b),custom};
+}
+async function settings(t){const r=await db(t,COLLECTION+'/settings');if(r.status===404){await ready(t);return DEFAULT}if(!r.ok)throw Error('Settings read failed');return valid(unpack(r.j))}
+async function save(t,x){const r=await db(t,COLLECTION+'/settings','PATCH',{fields:{payload:field(x)}});if(!r.ok)throw Error('Settings save failed');}
+function india(){const d=new Date(Date.now()+19800000);return {day:d.toISOString().slice(0,10),hour:d.getUTCHours()}}
+function rank(s){return crypto.createHash('sha256').update(s).digest('hex')}
+function selected(s,day){return (s.random?[...s.hours].sort((a,b)=>rank(day+':'+a).localeCompare(rank(day+':'+b))):s.hours).slice(0,s.limit)}
+function message(s,day,h){const pool=templates.map(([title,body,actionUrl])=>({title,body,actionUrl})).concat(s.custom);
+ const ordinal=Math.floor(Date.parse(day+'T00:00:00Z')/86400000);const n=s.random?parseInt(rank(day+':'+h+':message').slice(0,8),16)%pool.length:((ordinal*17+h)%pool.length+pool.length)%pool.length;return pool[n]}
+async function deliver(p){let result;const res={status(n){this.code=n;return this},json(x){result={code:this.code||200,data:x};return this},end(){return this}};await send({method:'POST',body:{app:'hadapsar',topic:'all',title:p.title,body:p.body,actionUrl:p.actionUrl,isLoudAlert:false}},res);return result||{code:500,data:{success:false,reason:'No FCM response'}}}
+function safeEq(a,b){return typeof a==='string'&&typeof b==='string'&&a.length===b.length&&crypto.timingSafeEqual(Buffer.from(a),Buffer.from(b))}
+async function claim(t,id,p){
+ const r=await db(t,COLLECTION+'?documentId='+encodeURIComponent(id),'POST',{fields:{payload:field(p)}});
+ if(r.status===409)return false;if(!r.ok)throw Error('Duplicate lock unavailable');return true;
+}
+async function log(t,id,p){const r=await db(t,COLLECTION+'/'+id,'PATCH',{fields:{payload:field(p)}});if(!r.ok)console.error('auto-push: log write failed',id,r.status)}
+module.exports=async(req,res)=>{
+ res.setHeader('Cache-Control','no-store');
+ const action=req.query?.action;
+ try{
+  if(req.method==='GET'&&action==='health'){try{const t=await token();await ready(t);return res.status(200).json({storage:'ready',schedulerConfigured:!!process.env.CRON_SECRET})}catch(e){return res.status(503).json({storage:'unavailable',reason:e.message,schedulerConfigured:!!process.env.CRON_SECRET})}}
+  if(req.method==='GET'&&req.query?.slot!==undefined){
+   if(!process.env.CRON_SECRET||!safeEq(req.headers.authorization,'Bearer '+process.env.CRON_SECRET))return res.status(401).json({error:'Unauthorized'});
+   const h=Number(req.query.slot);if(!HOURS.includes(h))return res.status(400).json({error:'Invalid slot'});
+   const {day,hour}=india();if(hour!==h&&hour!==h-1)return res.status(200).json({skipped:'outside scheduled window'});
+   const t=await token(),s=await settings(t);if(!s.enabled||!selected(s,day).includes(h))return res.status(200).json({skipped:'not selected'});
+   const p=message(s,day,h),id='slot_'+day+'_'+h;const entry={day,hour:h,title:p.title,status:'attempted',at:new Date().toISOString()};
+   if(!await claim(t,id,entry))return res.status(200).json({skipped:'already attempted'});
+   const out=await deliver(p);await log(t,id,{...entry,status:out.data.success?'FCM accepted':'failed',reason:out.data.reason||null,messageId:out.data.messageId||null});
+   return res.status(out.data.success?200:502).json({accepted:!!out.data.success});
+  }
+  if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
+  if(req.body?.action==='session')return startSession({...req,body:{invite:req.body.invite}},res);
+  if(!authorized(req))return res.status(401).json({error:'Private admin session required'});
+  const t=await token();await ready(t);
+  if(req.body?.action==='save'){const s=valid(req.body.settings);await save(t,s);return res.status(200).json({settings:s})}
+  const s=await settings(t);const {day,hour}=india();
+  if(req.body?.action==='random'){const pool=templates.map(([title,body,actionUrl])=>({title,body,actionUrl})).concat(s.custom);return res.status(200).json({message:pool[crypto.randomInt(pool.length)]})}
+  if(req.body?.action==='status'){
+   const rows=await Promise.all(HOURS.map(h=>db(t,COLLECTION+'/slot_'+day+'_'+h)));
+   const logs=rows.filter(r=>r.ok).map(r=>unpack(r.j));
+   return res.status(200).json({settings:s,planned:selected(s,day),logs,poolSize:templates.length+s.custom.length})}
+  return res.status(400).json({error:'Unknown action'});
+ }catch(e){console.error('auto-push:',e.message);return res.status(503).json({error:e.message==='Invalid settings'||e.message==='Invalid custom messages'||e.message==='Invalid custom message'?e.message:'Automation unavailable; check server configuration and logs'})}
+};
