@@ -91,6 +91,7 @@ async function trustedWorkflow(header){
   return !!key&&crypto.verify('RSA-SHA256',Buffer.from(parts[0]+'.'+parts[1]),crypto.createPublicKey({key,format:'jwk'}),Buffer.from(parts[2],'base64url'));
  }catch{return false}
 }
+async function heartbeat(t,source){await t.updateOne({_id:'heartbeat_'+source},{$set:{at:new Date().toISOString()}},{upsert:true});console.log('auto scheduler tick',source)}
 async function runCustom(t,s,source){
  if(!s.enabled||s.mode!=='custom')return {skipped:'custom schedule inactive'};
  const {day,hour,minute}=india(),now=Date.now(),results=[];
@@ -98,7 +99,7 @@ async function runCustom(t,s,source){
  for(const time of s.times){
   const [hh,mm]=time.split(':').map(Number),delay=hour*60+minute-hh*60-mm;
   const due=Date.parse(day+'T'+time+':00+05:30');
-  if(delay<0||delay>90||due<s.customSince)continue;
+  if(delay<0||delay>90||due<Math.floor(s.customSince/60000)*60000)continue;
   const p=message(s,day,hh*60+mm),id='slot_'+day+'_custom_'+time.replace(':','');
   const entry={day,hour:hh,slot:time,title:p.title,status:'attempted',source,at:new Date(now).toISOString()};
   if(!await claim(t,id,entry,s.limit))continue;
@@ -114,14 +115,14 @@ module.exports=async(req,res)=>{
   if(req.method==='GET'&&action==='health'){try{const t=await token();await ready(t);return res.status(200).json({storage:'ready',schedulerConfigured:!!process.env.CRON_SECRET})}catch(e){return res.status(503).json({storage:'unavailable',reason:'Database connection unavailable',schedulerConfigured:!!process.env.CRON_SECRET})}}
   if(req.method==='POST'&&action==='tick'){
    if(!await trustedWorkflow(req.headers.authorization))return res.status(401).json({error:'Unauthorized scheduler'});
-   const t=await token(),s=await settings(t);const out=await runCustom(t,s,'github-actions');
+   const t=await token(),s=await settings(t);await heartbeat(t,'github-actions');const out=await runCustom(t,s,'github-actions');
    return res.status(out.results?.some(x=>!x.accepted)?502:200).json(out);
   }
   if(req.method==='GET'&&req.query?.slot!==undefined){
    if(!process.env.CRON_SECRET||!safeEq(req.headers.authorization,'Bearer '+process.env.CRON_SECRET))return res.status(401).json({error:'Unauthorized'});
    const h=Number(req.query.slot);if(!Number.isInteger(h)||h<0||h>23)return res.status(400).json({error:'Invalid slot'});
    const {day,hour}=india();if(hour!==h&&hour!==(h+23)%24)return res.status(200).json({skipped:'outside scheduled window'});
-   const t=await token(),s=await settings(t);if(s.mode==='custom'){const out=await runCustom(t,s,'vercel-fallback');return res.status(out.results?.some(x=>!x.accepted)?502:200).json(out)}if(!HOURS.includes(h)||!s.enabled||!selected(s,day).includes(h))return res.status(200).json({skipped:'not selected'});
+   const t=await token(),s=await settings(t);await heartbeat(t,'vercel');if(s.mode==='custom'){const out=await runCustom(t,s,'vercel-fallback');return res.status(out.results?.some(x=>!x.accepted)?502:200).json(out)}if(!HOURS.includes(h)||!s.enabled||!selected(s,day).includes(h))return res.status(200).json({skipped:'not selected'});
    const p=message(s,day,h),id='slot_'+day+'_'+h;const entry={day,hour:h,title:p.title,status:'attempted',at:new Date().toISOString()};
    if(!await claim(t,id,entry,s.limit))return res.status(200).json({skipped:'already attempted or daily limit reached'});
    const out=await deliver(p);await log(t,id,{...entry,status:out.data.success?'FCM accepted':'failed',reason:out.data.reason||null,messageId:out.data.messageId||null});
@@ -136,8 +137,8 @@ module.exports=async(req,res)=>{
   if(req.body?.action==='random'){const pool=templates.map(([title,body,actionUrl])=>({title,body,actionUrl})).concat(s.custom);return res.status(200).json({message:pool[crypto.randomInt(pool.length)]})}
   if(req.body?.action==='status'){
    const rows=await t.find({_id:{$regex:'^slot_'+day+'_'}}).sort({'payload.at':1}).limit(30).toArray();
-   const logs=rows.map(r=>r.payload);
-   return res.status(200).json({settings:s,planned:s.mode==='custom'?s.times:selected(s,day),logs,poolSize:templates.length+s.custom.length})}
+   const logs=rows.map(r=>r.payload);const beats=await t.find({_id:{$in:['heartbeat_github-actions','heartbeat_vercel']}}).toArray();const scheduler=Object.fromEntries(beats.map(b=>[b._id.slice(10),b.at]));
+   return res.status(200).json({settings:s,planned:s.mode==='custom'?s.times:selected(s,day),logs,scheduler,serverTime:new Date().toISOString(),poolSize:templates.length+s.custom.length})}
   return res.status(400).json({error:'Unknown action'});
  }catch(e){console.error('auto-push:',e.message);return res.status(503).json({error:e.message==='Invalid settings'||e.message==='Invalid custom messages'||e.message==='Invalid custom message'||e.message==='Choose 1 to daily limit custom times'?e.message:'Automation unavailable; check server configuration and logs'})}
 };

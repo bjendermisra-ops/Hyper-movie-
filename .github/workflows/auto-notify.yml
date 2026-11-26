@@ -1,7 +1,7 @@
 name: Custom notification scheduler
 on:
   schedule:
-    - cron: '2/5 * * * *'
+    - cron: '*/5 * * * *'
 permissions:
   id-token: write
   contents: read
