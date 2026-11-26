@@ -317,7 +317,7 @@ img,svg,pre{max-width:100%}
       <p>मंदिर सूचना केंद्र · कमांड सेंटर</p>
     </div>
     <div class="sys">
-      <div class="on"><i></i> FCM गेटवे चालू</div>
+      <div class="on"><i></i> सिस्टम चालू</div>
       <div id="sysClock">--:--:--</div>
     </div>
   </header>
@@ -341,8 +341,8 @@ img,svg,pre{max-width:100%}
 
         <details class="test">
           <summary>एक फोन पर टेस्ट करें</summary>
-          <label for="testDevice">इस ऐप का FCM registration token</label>
-          <input id="testDevice" type="password" autocomplete="off" placeholder="Test phone token">
+          <label for="testDevice">टेस्ट फोन का कोड</label>
+          <input id="testDevice" type="password" autocomplete="off" placeholder="टेस्ट कोड">
           <p>टोकन भरने पर संदेश सिर्फ उस फोन पर जाएगा। खाली रखने पर चुने हुए topic पर जाएगा।</p>
         </details>
 
@@ -374,14 +374,6 @@ img,svg,pre{max-width:100%}
           </div>
         </div>
 
-        <div class="loud" id="loudBox">
-          <div class="t">
-            <b><i class="fas fa-volume-high"></i> सुपर लाउड अलार्म</b>
-            <small>फोन साइलेंट होने पर भी तेज़ आवाज़ में बजेगा। सिर्फ महाआरती जैसे ज़रूरी समय पर।</small>
-          </div>
-          <label class="sw" aria-label="सुपर लाउड अलार्म"><input type="checkbox" id="loudSwitch"><span></span></label>
-        </div>
-
         <div class="field">
           <label for="pushTitle">शीर्षक <small class="count" id="cTitle">0 / 60</small></label>
           <input type="text" id="pushTitle" class="input" maxlength="100" placeholder="जैसे: महाआरती शुरू हो चुकी है" required oninput="updatePreview()">
@@ -399,13 +391,8 @@ img,svg,pre{max-width:100%}
         </div>
 
         <button type="submit" id="submitBtn" class="send"><i class="fas fa-bolt"></i> अभी नोटिफिकेशन भेजें</button>
-        <div class="row2">
-          <button type="button" class="ghost" onclick="clearForm()"><i class="fas fa-eraser"></i> फॉर्म खाली करें</button>
-          <button type="button" class="ghost" onclick="copyPayload()"><i class="fas fa-code"></i> पेलोड कॉपी करें</button>
-        </div>
+        <div style="margin-top:10px"><button type="button" class="ghost" style="width:100%" onclick="clearForm()"><i class="fas fa-eraser"></i> फॉर्म खाली करें</button></div>
       </form>
-
-      <details class="pl"><summary>&gt; लाइव पेलोड देखें (JSON)</summary><pre id="plView"></pre></details>
 
       <div id="diagConsole" class="diag d-none">
         <div class="bar"><i></i><i></i><i></i><span id="diagTimestamp"></span></div>
@@ -431,7 +418,6 @@ img,svg,pre{max-width:100%}
             <div class="n-head">
               <div class="n-ico"><i class="fas fa-bell"></i></div>
               <span>ISKCON Hadapsar</span><span style="opacity:.55">· अभी</span>
-              <span class="n-loud d-none" id="prevAlarmIcon"><i class="fas fa-volume-high"></i> लाउड</span>
             </div>
             <div class="n-title" id="prevTitle">शीर्षक यहाँ दिखेगा</div>
             <div class="n-body" id="prevBody">आपका पावन संदेश यहाँ दिखेगा</div>
@@ -481,11 +467,11 @@ const SCREENS = [
   { v:'dono.html',          name:'दान / सेवा',     sub:'सेवा में योगदान',  icon:'fa-hand-holding-heart' }
 ];
 const TEMPLATES = [
-  { n:'🔴 महाआरती लाइव', t:'🔴 महाआरती शुरू हो चुकी है', b:'हरे कृष्ण! श्री श्री राधा कृष्णचंद्र की महाआरती का लाइव दर्शन करें।', topic:'all', screen:'daily_darshan.html', loud:true },
-  { n:'🌸 आज के दर्शन', t:'🌸 आज के दर्शन तैयार हैं', b:'आज के श्रृंगार दर्शन का आनंद लें। हरे कृष्ण!', topic:'darshan', screen:'daily_darshan.html', loud:false },
-  { n:'🌙 एकादशी', t:'🌙 कल एकादशी है', b:'कल एकादशी व्रत है। पारण का समय कैलेंडर में देखें।', topic:'all', screen:'calendar.html', loud:false },
-  { n:'📿 जप', t:'📿 आइए, साथ में जप करें', b:'ग्लोबल जप में जुड़िए और आज की माला पूरी कीजिए।', topic:'all', screen:'global_jap.html', loud:false },
-  { n:'🙏 सेवा अपील', t:'🙏 सेवा में सहभागी बनें', b:'आपकी छोटी सी सेवा भी भगवान को प्रिय है। हरे कृष्ण!', topic:'all', screen:'dono.html', loud:false }
+  { n:'🔴 महाआरती लाइव', t:'🔴 महाआरती शुरू हो चुकी है', b:'हरे कृष्ण! श्री श्री राधा कृष्णचंद्र की महाआरती का लाइव दर्शन करें।', topic:'all', screen:'daily_darshan.html' },
+  { n:'🌸 आज के दर्शन', t:'🌸 आज के दर्शन तैयार हैं', b:'आज के श्रृंगार दर्शन का आनंद लें। हरे कृष्ण!', topic:'darshan', screen:'daily_darshan.html' },
+  { n:'🌙 एकादशी', t:'🌙 कल एकादशी है', b:'कल एकादशी व्रत है। पारण का समय कैलेंडर में देखें।', topic:'all', screen:'calendar.html' },
+  { n:'📿 जप', t:'📿 आइए, साथ में जप करें', b:'ग्लोबल जप में जुड़िए और आज की माला पूरी कीजिए।', topic:'all', screen:'global_jap.html' },
+  { n:'🙏 सेवा अपील', t:'🙏 सेवा में सहभागी बनें', b:'आपकी छोटी सी सेवा भी भगवान को प्रिय है। हरे कृष्ण!', topic:'all', screen:'dono.html' }
 ];
 const EMOJIS = ['🙏','🪔','🌸','🔴','📿','🕉️','🌙','✨','🎉','📢'];
 const HKEY='fcm_push_history', DKEY='np_draft';
@@ -498,7 +484,7 @@ function boot(){
   const b=$('boot');
   let seen=false; try{seen=sessionStorage.getItem('np_boot')}catch(_){}
   if(seen || matchMedia('(prefers-reduced-motion:reduce)').matches){ b.remove(); return; }
-  const lines=['> सिस्टम शुरू हो रहा है...','> FCM गेटवे से कनेक्शन ... OK','> टॉपिक: all, darshan ... तैयार','> सूचना केंद्र चालू। हरे कृष्ण 🙏'];
+  const lines=['> सिस्टम शुरू हो रहा है...','> सुरक्षित कनेक्शन ... OK','> सूचना केंद्र चालू। हरे कृष्ण 🙏'];
   let i=0; const el=$('bootText');
   const t=setInterval(()=>{
     if(i<lines.length){ el.textContent+=lines[i++]+'\n'; }
@@ -542,7 +528,7 @@ function applyTpl(i){
   const t=TEMPLATES[i];
   $('pushTitle').value=t.t; $('pushBody').value=t.b;
   setTopic(t.topic); setMode('internal'); setScreen(t.screen);
-  $('loudSwitch').checked=t.loud; updatePreview(); toast('तैयार संदेश लग गया');
+  updatePreview(); toast('तैयार संदेश लग गया');
 }
 function addEmoji(e){
   const el=$('pushTitle'), s=el.selectionStart??el.value.length, en=el.selectionEnd??s;
@@ -569,13 +555,9 @@ function setCount(id,len,soft,hard){
 }
 function updatePreview(){
   const title=$('pushTitle').value.trim(), body=$('pushBody').value.trim(), img=$('pushImage').value.trim();
-  const loud=$('loudSwitch').checked;
   $('prevTitle').textContent=title||'शीर्षक यहाँ दिखेगा';
   $('prevBody').textContent=body||'आपका पावन संदेश यहाँ दिखेगा';
   $('prevLinkText').textContent=friendlyTarget();
-  $('prevAlarmIcon').classList.toggle('d-none',!loud);
-  $('notif').classList.toggle('loudring',loud);
-  $('loudBox').classList.toggle('on',loud);
   setCount('cTitle',$('pushTitle').value.length,60,90);
   setCount('cBody',$('pushBody').value.length,200,400);
   const pi=$('prevImg');
@@ -584,8 +566,6 @@ function updatePreview(){
     pi.onload=()=>{pi.style.display=expand?'block':'none'};
     pi.src=img;
   } else { pi.style.display='none'; pi.removeAttribute('src'); }
-  const p=collect();
-  $('plView').textContent=JSON.stringify({app:'hadapsar',title:p.title,body:p.body,imageUrl:p.imageUrl,actionUrl:p.actionUrl,topic:p.topic,isLoudAlert:p.isLoudAlert},null,2);
   saveDraft();
 }
 function setExpand(v){
@@ -605,7 +585,7 @@ function tickClock(){
 function saveDraft(){
   try{ localStorage.setItem(DKEY,JSON.stringify({
     t:$('pushTitle').value,b:$('pushBody').value,i:$('pushImage').value,u:$('pushCustomUrl').value,
-    topic:$('pushTopic').value,screen:$('pushInternalScreen').value,mode:$('linkMode').value,loud:$('loudSwitch').checked
+    topic:$('pushTopic').value,screen:$('pushInternalScreen').value,mode:$('linkMode').value
   })); }catch(_){}
 }
 function loadDraft(){
@@ -614,12 +594,12 @@ function loadDraft(){
     $('pushTitle').value=d.t||''; $('pushBody').value=d.b||''; $('pushImage').value=d.i||''; $('pushCustomUrl').value=d.u||'';
     setTopic(d.topic||'all');
     setScreen(SCREENS.some(s=>s.v===d.screen)?d.screen:'index.html');
-    setMode(d.mode||'internal'); $('loudSwitch').checked=!!d.loud;
+    setMode(d.mode||'internal');
   }catch(_){}
 }
 function clearForm(){
   ['pushTitle','pushBody','pushImage','pushCustomUrl'].forEach(i=>$(i).value='');
-  $('loudSwitch').checked=false; setTopic('all'); setScreen('index.html'); setMode('internal');
+  setTopic('all'); setScreen('index.html'); setMode('internal');
   try{localStorage.removeItem(DKEY)}catch(_){}
   updatePreview(); toast('फॉर्म खाली हो गया');
 }
@@ -627,7 +607,7 @@ function clearForm(){
 /* ================= SEND FLOW ================= */
 function collect(){
   return { title:$('pushTitle').value.trim(), body:$('pushBody').value.trim(), imageUrl:$('pushImage').value.trim(),
-    actionUrl:getSelectedActionUrl(), topic:$('pushTopic').value, isLoudAlert:$('loudSwitch').checked, mode:$('linkMode').value };
+    actionUrl:getSelectedActionUrl(), topic:$('pushTopic').value, isLoudAlert:false, mode:$('linkMode').value };
 }
 function validate(p){
   if(!p.title) return 'शीर्षक खाली है।';
@@ -646,15 +626,11 @@ function handleSendPush(e){
     ['किसे', test?'सिर्फ टेस्ट फोन':(p.topic==='all'?'समस्त भक्तगण':'दर्शन सब्सक्राइबर')],
     ['शीर्षक', p.title],
     ['क्या खुलेगा', p.mode==='external'?p.actionUrl:screenName(p.actionUrl)],
-    ['आवाज़', p.isLoudAlert?'सुपर लाउड अलार्म':'सामान्य'],
     ['फोटो', p.imageUrl?'हाँ':'नहीं']
   ];
   $('sheetSum').innerHTML=rows.map(r=>`<div><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join('');
   const w=$('sheetWarn'), cb=$('confirmBtn');
-  if(!test && p.topic==='all' && p.isLoudAlert){
-    w.textContent='यह सभी भक्तों के फोन पर, साइलेंट मोड में भी, तेज़ आवाज़ में बजेगा। भेजने के बाद वापस नहीं लिया जा सकता।';
-    w.classList.remove('d-none'); cb.classList.add('danger');
-  } else if(!test && p.topic==='all'){
+  if(!test && p.topic==='all'){
     w.textContent='यह सभी भक्तों को जाएगा। भेजने के बाद वापस नहीं लिया जा सकता।';
     w.classList.remove('d-none'); cb.classList.remove('danger');
   } else { w.classList.add('d-none'); cb.classList.remove('danger'); }
@@ -674,8 +650,8 @@ async function confirmSend(){
   head.textContent='> भेजा जा रहा है'; msg.textContent=''; why.textContent='';
   $('termLog').innerHTML='';
   $('diagTimestamp').textContent=new Date().toLocaleTimeString();
-  tlog('$ पेलोड तैयार ... OK','ok');
-  tlog('$ POST /api/send-push ...');
+  tlog('$ सूचना तैयार ... OK','ok');
+  tlog('$ भेजी जा रही है ...');
   if(navigator.vibrate) navigator.vibrate(30);
 
   const meta={body:p.body,topic:p.topic,loud:p.isLoudAlert,img:p.imageUrl,mode:p.mode};
@@ -688,11 +664,11 @@ async function confirmSend(){
     $('diagTimestamp').textContent=new Date().toLocaleTimeString();
 
     if(res.ok && data.success){
-      tlog('< '+res.status+' OK','ok');
-      head.textContent='Firebase ने संदेश स्वीकार किया';
+      tlog('< भेज दी गई ✓','ok');
+      head.textContent='सूचना भेज दी गई';
       msg.textContent=data.receiptHash?'टेस्ट फोन पर आया कोड नीचे डालें।':'प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।';
       why.textContent='लक्ष्य: '+(data.targetTopic||p.topic);
-      saveToHistory({title:p.title,link:data.targetLink||p.actionUrl,status:'Firebase ने स्वीकार किया',time:new Date().toLocaleTimeString(),...meta});
+      saveToHistory({title:p.title,link:data.targetLink||p.actionUrl,status:'Success',time:new Date().toLocaleTimeString(),...meta});
       offerReceipt(why,data,()=>{
         head.textContent='टेस्ट फोन पर डिलीवरी की पुष्टि हुई';
         saveToHistory({title:p.title,link:p.actionUrl,status:'Test phone confirmed',time:new Date().toLocaleTimeString(),...meta});
@@ -700,7 +676,7 @@ async function confirmSend(){
       toast('भेज दिया गया 🙏');
     } else {
       dc.classList.add('err');
-      tlog('< '+res.status+' त्रुटि','er');
+      tlog('< विफल','er');
       head.textContent='भेजना विफल रहा';
       msg.textContent='कारण: '+(data.reason||'अज्ञात त्रुटि');
       why.textContent=data.details||'कोई विवरण उपलब्ध नहीं।';
@@ -710,7 +686,7 @@ async function confirmSend(){
     dc.classList.add('err');
     tlog('< कनेक्शन टूटा','er');
     head.textContent='सर्वर से कनेक्शन नहीं हुआ';
-    msg.textContent='इंटरनेट जाँचें और फिर कोशिश करें। Vercel API नहीं मिला।';
+    msg.textContent='इंटरनेट जाँचें और फिर कोशिश करें। सर्वर नहीं मिला।';
     why.textContent=netErr.message;
     saveToHistory({title:p.title,link:p.actionUrl,status:'Gateway Error',time:new Date().toLocaleTimeString(),...meta});
   }finally{
@@ -734,6 +710,13 @@ function saveToHistory(item){
   renderHistory();
 }
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+function statusLabel(s){
+  if(s==='Success'||/Firebase/.test(s||'')) return 'भेज दी गई';
+  if(s==='Failed') return 'विफल';
+  if(s==='Gateway Error') return 'कनेक्शन त्रुटि';
+  if(s==='Test phone confirmed') return 'टेस्ट फोन पर पहुँची';
+  return s||'';
+}
 function isFail(s){return /fail|error/i.test(s||'')}
 function renderHistory(){
   const h=getHist(), box=$('historyBody');
@@ -744,7 +727,7 @@ function renderHistory(){
   if(!h.length){ box.innerHTML='<div class="empty">अभी कोई प्रसारण नहीं हुआ। बाईं ओर से पहली सूचना भेजें।</div>'; return; }
   box.innerHTML=h.map((x,i)=>{
     const cls=isFail(x.status)?'f':(x.status==='Test phone confirmed'?'t':'');
-    const st=x.status==='Success'?'Firebase ने स्वीकार किया':x.status;
+    const st=statusLabel(x.status);
     const where=/^https?:/i.test(x.link||'')?'बाहरी लिंक':screenName(x.link||'');
     return `<div class="h-item"><span class="h-dot ${cls}"></span>
       <div class="h-main"><b>${esc(x.title)}</b><small>${esc(st)} · ${esc(where)}</small></div>
@@ -756,7 +739,7 @@ function renderHistory(){
 function reuse(i){
   const x=getHist()[i]; if(!x) return;
   $('pushTitle').value=x.title||''; $('pushBody').value=x.body||''; $('pushImage').value=x.img||'';
-  setTopic(x.topic||'all'); $('loudSwitch').checked=!!x.loud;
+  setTopic(x.topic||'all');
   if(x.mode==='external'){ $('pushCustomUrl').value=x.link||''; setMode('external'); }
   else { setMode('internal'); setScreen(SCREENS.some(s=>s.v===x.link)?x.link:'index.html'); }
   updatePreview(); window.scrollTo({top:0,behavior:'smooth'}); toast('पुरानी सूचना फॉर्म में भर गई');
@@ -769,16 +752,11 @@ function clearHistory(){
 }
 
 /* ================= EXTRAS ================= */
-function copyPayload(){
-  const j=$('plView').textContent;
-  (navigator.clipboard?navigator.clipboard.writeText(j):Promise.reject()).then(()=>toast('पेलोड कॉपी हो गया')).catch(()=>toast('कॉपी नहीं हो सका'));
-}
 let tt; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2200); }
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closeSheet();
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter') $('pushForm').requestSubmit();
 });
-$('loudSwitch').addEventListener('change',()=>{ updatePreview(); if($('loudSwitch').checked&&navigator.vibrate) navigator.vibrate([60,40,60]); });
 
 document.addEventListener('DOMContentLoaded',()=>{
   boot(); buildUI(); loadDraft(); setExpand(true); renderHistory(); updatePreview(); tickClock(); setInterval(tickClock,1000);
