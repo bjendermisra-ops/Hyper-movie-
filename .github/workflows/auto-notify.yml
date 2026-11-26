@@ -1,0 +1,22 @@
+name: Custom notification scheduler
+on:
+  schedule:
+    - cron: '2/5 * * * *'
+permissions:
+  id-token: write
+  contents: read
+concurrency:
+  group: hadapsar-custom-notify
+  cancel-in-progress: false
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Invoke authenticated scheduled-only endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          jwt="$(curl --fail --silent --show-error --max-time 15 -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=hadapsar-auto-push" | jq -er '.value')"
+          echo "::add-mask::$jwt"
+          curl --fail-with-body --silent --show-error --max-time 45 -X POST -H "Authorization: Bearer $jwt" https://hypermovie.vercel.app/api/auto-push?action=tick
