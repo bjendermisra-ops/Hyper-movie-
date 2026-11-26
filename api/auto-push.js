@@ -1,8 +1,6 @@
 const crypto = require('node:crypto');
 const {authorized,startSession}=require('../lib/access');
 const send=require('./send-push');
-const PROJECT='iskcon-hadapsar-645be';
-const ROOT='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents';
 const COLLECTION='hadapsar_auto_push';
 const HOURS=Array.from({length:17},(_,i)=>i+5);
 const DEFAULT={enabled:true,random:true,limit:3,hours:[5,8,12,18,21],custom:[]};
@@ -32,21 +30,25 @@ const templates=[
 ['🌸 आज का संकल्प','आज अपने कार्य प्रेम और ईमानदारी से करें।','index.html'],
 ['🙏 प्रभु का स्मरण','अपने परिवार के साथ कुछ क्षण प्रार्थना करें।','index.html']
 ];
-function b64(x){return Buffer.from(JSON.stringify(x)).toString('base64url')}
+const {MongoClient}=require('mongodb');
+let clientPromise;
 async function token(){
- const a=JSON.parse(process.env.HADAPSAR_SERVICE_ACCOUNT||'null');
- if(!a||a.project_id!==PROJECT)throw Error('Service account unavailable');
- const now=Math.floor(Date.now()/1000);
- const input=b64({alg:'RS256',typ:'JWT'})+'.'+b64({iss:a.client_email,scope:'https://www.googleapis.com/auth/cloud-platform',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+3600});
- const jwt=input+'.'+crypto.sign('RSA-SHA256',Buffer.from(input),a.private_key).toString('base64url');
- const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',body:new URLSearchParams({grant_type:'urn:ietf:params:oauth:grant-type:jwt-bearer',assertion:jwt})});
- const j=await r.json();if(!r.ok||!j.access_token)throw Error('Google OAuth failed');return j.access_token;
+ if(!process.env.AUTO_MONGO_URI)throw Error('Database configuration missing');
+ if(!clientPromise){const client=new MongoClient(process.env.AUTO_MONGO_URI,{serverSelectionTimeoutMS:8000,connectTimeoutMS:8000,maxPoolSize:3});clientPromise=client.connect().catch(e=>{clientPromise=null;throw e})}
+ const client=await clientPromise;return client.db('hadapsar_auto').collection('notifications');
 }
-async function db(t,path,method='GET',body){
- const r=await fetch(ROOT+'/'+path,{method,headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
- const j=await r.json();return {status:r.status,ok:r.ok,j};
+async function db(c,path,method='GET',body){
+ const [part,query='']=path.split('?');const id=part.split('/')[1];
+ if(method==='GET'){
+  if(!id){await c.findOne({}, {projection:{_id:1}});return {status:200,ok:true,j:{}}}
+  const d=await c.findOne({_id:id});return d?{status:200,ok:true,j:{fields:{payload:field(d.payload)}}}:{status:404,ok:false,j:{}};
+ }
+ const payload=JSON.parse(body.fields.payload.stringValue);
+ if(method==='PATCH'){await c.updateOne({_id:id},{$set:{payload}},{upsert:true});return {status:200,ok:true,j:{}}}
+ if(method==='POST'){const key=new URLSearchParams(query).get('documentId');try{await c.insertOne({_id:key,payload});return {status:200,ok:true,j:{}}}catch(e){if(e.code===11000)return {status:409,ok:false,j:{}};throw e}}
+ throw Error('Unsupported database operation');
 }
-async function ready(t){const r=await db(t,COLLECTION+'?pageSize=1');if(!r.ok)throw Error('Firestore unavailable (HTTP '+r.status+')');}
+async function ready(c){await c.findOne({}, {projection:{_id:1}})}
 function field(v){return {stringValue:JSON.stringify(v)}}
 function unpack(x){return JSON.parse(x.fields.payload.stringValue)}
 function valid(x){
@@ -63,24 +65,27 @@ function selected(s,day){return (s.random?[...s.hours].sort((a,b)=>rank(day+':'+
 function message(s,day,h){const pool=templates.map(([title,body,actionUrl])=>({title,body,actionUrl})).concat(s.custom);
  const ordinal=Math.floor(Date.parse(day+'T00:00:00Z')/86400000);const n=s.random?parseInt(rank(day+':'+h+':message').slice(0,8),16)%pool.length:((ordinal*17+h)%pool.length+pool.length)%pool.length;return pool[n]}
 async function deliver(p){let result;const res={status(n){this.code=n;return this},json(x){result={code:this.code||200,data:x};return this},end(){return this}};await send({method:'POST',body:{app:'hadapsar',topic:'all',title:p.title,body:p.body,actionUrl:p.actionUrl,isLoudAlert:false}},res);return result||{code:500,data:{success:false,reason:'No FCM response'}}}
-function safeEq(a,b){return typeof a==='string'&&typeof b==='string'&&a.length===b.length&&crypto.timingSafeEqual(Buffer.from(a),Buffer.from(b))}
-async function claim(t,id,p){
- const r=await db(t,COLLECTION+'?documentId='+encodeURIComponent(id),'POST',{fields:{payload:field(p)}});
- if(r.status===409)return false;if(!r.ok)throw Error('Duplicate lock unavailable');return true;
+function safeEq(a,b){return typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&crypto.timingSafeEqual(Buffer.from(a),Buffer.from(b))}
+async function claim(t,id,p,limit){
+ const dayId='day_'+p.day;
+ try{await t.updateOne({_id:dayId},{$setOnInsert:{count:0,slots:[]}},{upsert:true})}catch(e){if(e.code!==11000)throw e}
+ const r=await t.updateOne({_id:dayId,count:{$lt:limit},slots:{$ne:p.hour}},{$inc:{count:1},$addToSet:{slots:p.hour}});
+ if(!r.modifiedCount)return false;
+ await t.insertOne({_id:id,payload:p});return true;
 }
 async function log(t,id,p){const r=await db(t,COLLECTION+'/'+id,'PATCH',{fields:{payload:field(p)}});if(!r.ok)console.error('auto-push: log write failed',id,r.status)}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');
  const action=req.query?.action;
  try{
-  if(req.method==='GET'&&action==='health'){try{const t=await token();await ready(t);return res.status(200).json({storage:'ready',schedulerConfigured:!!process.env.CRON_SECRET})}catch(e){return res.status(503).json({storage:'unavailable',reason:e.message,schedulerConfigured:!!process.env.CRON_SECRET})}}
+  if(req.method==='GET'&&action==='health'){try{const t=await token();await ready(t);return res.status(200).json({storage:'ready',schedulerConfigured:!!process.env.CRON_SECRET})}catch(e){return res.status(503).json({storage:'unavailable',reason:'Database connection unavailable',schedulerConfigured:!!process.env.CRON_SECRET})}}
   if(req.method==='GET'&&req.query?.slot!==undefined){
    if(!process.env.CRON_SECRET||!safeEq(req.headers.authorization,'Bearer '+process.env.CRON_SECRET))return res.status(401).json({error:'Unauthorized'});
    const h=Number(req.query.slot);if(!HOURS.includes(h))return res.status(400).json({error:'Invalid slot'});
    const {day,hour}=india();if(hour!==h&&hour!==h-1)return res.status(200).json({skipped:'outside scheduled window'});
    const t=await token(),s=await settings(t);if(!s.enabled||!selected(s,day).includes(h))return res.status(200).json({skipped:'not selected'});
    const p=message(s,day,h),id='slot_'+day+'_'+h;const entry={day,hour:h,title:p.title,status:'attempted',at:new Date().toISOString()};
-   if(!await claim(t,id,entry))return res.status(200).json({skipped:'already attempted'});
+   if(!await claim(t,id,entry,s.limit))return res.status(200).json({skipped:'already attempted or daily limit reached'});
    const out=await deliver(p);await log(t,id,{...entry,status:out.data.success?'FCM accepted':'failed',reason:out.data.reason||null,messageId:out.data.messageId||null});
    return res.status(out.data.success?200:502).json({accepted:!!out.data.success});
   }
