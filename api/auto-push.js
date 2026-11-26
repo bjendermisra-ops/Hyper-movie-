@@ -90,8 +90,8 @@ module.exports=async(req,res)=>{
    return res.status(out.data.success?200:502).json({accepted:!!out.data.success});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
-  if(req.body?.action==='session')return startSession(req,res);
-  if(!authorized(req))return res.status(401).json({error:'Private admin session required'});
+  if(req.body?.action==='session')return startSession(req,res,process.env.AUTO_ADMIN_INVITE);
+  if(!authorized(req))return res.status(401).json({error:'Open your private access link to continue'});
   const t=await token();await ready(t);
   if(req.body?.action==='save'){const s=valid(req.body.settings);await save(t,s);return res.status(200).json({settings:s})}
   const s=await settings(t);const {day,hour}=india();
