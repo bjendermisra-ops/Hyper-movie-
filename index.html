@@ -321,6 +321,7 @@ img,svg,pre{max-width:100%}
       <div id="sysClock">--:--:--</div>
     </div>
   </header>
+  <div style="margin:0 0 14px;text-align:right"><a href="/analytics.html" style="color:inherit;text-decoration:underline;font-weight:650">Notification Analytics ↗</a></div>
 
   <section class="stats" aria-label="आँकड़े">
     <div class="stat"><b id="stToday">0</b><span>हाल के प्रसारण</span></div>
@@ -666,7 +667,7 @@ async function confirmSend(){
     if(res.ok && data.success){
       tlog('< भेज दी गई ✓','ok');
       head.textContent='सूचना भेज दी गई';
-      msg.textContent=data.receiptHash?'टेस्ट फोन पर आया कोड नीचे डालें।':'प्रसारण में हर फोन की अलग रसीद उपलब्ध नहीं होती।';
+      msg.textContent=data.receiptHash?'टेस्ट फोन पर आया कोड नीचे डालें।':data.analyticsStatus==='enabled'?'Firebase ने स्वीकार किया। डिवाइस की रसीद Analytics में दिखेगी।':'Firebase ने स्वीकार किया। इस संदेश की डिवाइस ट्रैकिंग उपलब्ध नहीं है।';
       why.textContent='लक्ष्य: '+(data.targetTopic||p.topic);
       saveToHistory({title:p.title,link:data.targetLink||p.actionUrl,status:'Success',time:new Date().toLocaleTimeString(),...meta});
       offerReceipt(why,data,()=>{
