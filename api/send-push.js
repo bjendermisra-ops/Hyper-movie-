@@ -1,5 +1,6 @@
 // api/send-push.js (Zero-Dependency Node.js FCM v1 Gateway)
 const crypto = require('crypto');
+const analytics = require('../lib/notification-analytics');
 
 const project = { id: 'iskcon-hadapsar-645be', secret: 'HADAPSAR_SERVICE_ACCOUNT' };
 
@@ -76,6 +77,13 @@ module.exports = async function handler(req, res) {
   // चेक करें कि क्या यह कोई वेब/यूट्यूब/प्लेस्टोर का लिंक है
   const isExternalUrl = /^https?:\/\//i.test(safeAction);
 
+  let campaign = null;
+  let analyticsStatus = 'unavailable';
+  async function record(status, extra) {
+    if (!campaign) return;
+    try { await analytics.finish(campaign.id, status, extra); }
+    catch (e) { analyticsStatus = 'history_update_failed'; console.error('notification analytics status unavailable'); }
+  }
   try {
     let account;
     try {
@@ -118,6 +126,19 @@ module.exports = async function handler(req, res) {
       }
     };
 
+    // Analytics is best effort: database failures do not cancel a manual send.
+    try {
+      campaign = await analytics.begin({
+        title: title.trim().slice(0, 200), body: body.trim().slice(0, 1000),
+        audience: deviceToken ? 'Test phone' : targetTopic, actionUrl: safeAction.slice(0, 1000),
+        singleDevice: !!deviceToken
+      }, fcmPayload.message.data, deviceToken ? 3800 : 1800);
+      Object.assign(fcmPayload.message.data, campaign.fields);
+      analyticsStatus = campaign.tracking ? 'enabled' : 'payload_too_large';
+    } catch (e) {
+      console.error('notification analytics storage unavailable; sending without tracking');
+    }
+
     const fcmRes = await fetch(`https://fcm.googleapis.com/v1/projects/${project.id}/messages:send`, {
       method: 'POST',
       headers: {
@@ -129,6 +150,7 @@ module.exports = async function handler(req, res) {
 
     const fcmData = await fcmRes.json();
     if (!fcmRes.ok) {
+      await record('rejected', {error: String(fcmData.error?.status || 'FCM_API_ERROR').slice(0, 100)});
       return res.status(fcmRes.status).json({
         success: false,
         reason: fcmData.error?.details?.find(item => item.errorCode)?.errorCode || fcmData.error?.status || "FCM_API_ERROR",
@@ -136,8 +158,14 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    if (!fcmData.name) return res.status(502).json({ success: false, reason: 'Firebase returned no message ID' });
+    if (!fcmData.name) {
+      await record('unknown', {error:'FCM response contained no message ID'});
+      return res.status(502).json({ success: false, reason: 'Firebase returned no message ID' });
+    }
+    await record('accepted', {messageId:fcmData.name});
     return res.status(200).json({
+      notificationId: campaign?.id || null,
+      analyticsStatus,
       deliveryStatus: 'unconfirmed',
       receiptHash: receipt ? crypto.createHash('sha256').update(receipt).digest('hex') : null,
       success: true,
@@ -150,6 +178,7 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (err) {
+    await record('unknown', {error:'Send outcome not confirmed'});
     return res.status(500).json({
       success: false,
       reason: "SERVER_EXECUTION_ERROR",
